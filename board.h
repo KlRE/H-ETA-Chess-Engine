@@ -20,13 +20,14 @@ struct UndoInfo {
 	
   //The en passant square. This is the square which pawns can move to in order to en passant capture an enemy pawn that has 
   //double pushed on the previous move
-  Square epsq;
+  Square epSq;
 
-  constexpr UndoInfo() : halfmoves(0), captured(NoPiece), epsq(NoSquare) {}
+  UndoInfo() : halfmoves(0), captured(NoPiece), epSq(NoSquare) {}
 	
   //This preserves the entry bitboard across moves
-  UndoInfo(const UndoInfo& prev) : 
-    halfmoves(prev.halfmoves + 1), captured(NoPiece), epsq(NoSquare) {}
+  //edited: no bitboard is
+  UndoInfo(const UndoInfo& prev) :
+          halfmoves(prev.halfmoves + 1), captured(NoPiece), epSq(NoSquare) {}
 };
 
 
@@ -37,11 +38,12 @@ private:
   uint64_t Pieces[2][7] = {};
   int board[64] = {};
   bool castle[2][2] = {};
+  UndoInfo history[256] = {};
 
-  Color SideToMove = White;
-  uint64_t epSqBb = 0ull;
-  int halfMovesC = 0;
-  int fullMoves = 0;
+  Color SideToMove;
+  uint64_t epSqBb;
+  int halfMovesC;
+  int fullMoves;
 
 public:
 
@@ -75,13 +77,13 @@ public:
      ************** in move.cpp **********
      ***************************************** */
   
-  Move *generateKingM(Move *list, const uint64_t &attacked, const uint64_t &OpPieces, Square sq);
+  Move* generateKingM(Move *list, const uint64_t &attacked, const uint64_t &OpPieces, Square sq);
   Move* generateCastles(Move *list, const uint64_t &attacked);
   Move* generatePawnM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
   Move* generateRookM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
   Move* generateKnightM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos);
-    Move* generateBishopM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
-    Move* generateQueenM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
+  Move* generateBishopM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
+  Move* generateQueenM(Move* list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask, uint64_t pos, int kingSq);
   
   Move *generateMoves(Move *list);
 

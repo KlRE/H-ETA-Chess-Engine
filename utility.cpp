@@ -2,13 +2,12 @@
 #include <vector>
 #include <iostream>
 
-#include "move.h"
 #include "utility.h"
 
 
 using namespace std;
 
-
+// returns the smallest bit of a bitboard as an square
 Square pop_lsb(uint64_t &i)
 {
   int out = __builtin_ffsll(i);

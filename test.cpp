@@ -1,4 +1,4 @@
- #include <iostream>
+#include <iostream>
 #include <vector>
 #include <cstdint>
 #include <iomanip>
@@ -13,13 +13,11 @@ using namespace std;
 
 /* TODO:
    - testing ep. function
-
- 
 */
 
 void alltests()
 {
-  // test1();
+  test();
   test2();
   // test3();
   // test4();

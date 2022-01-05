@@ -1,5 +1,4 @@
 #include <iostream>
-#include <iomanip>
 #include <cstdint>
 
 #include "board.h"
