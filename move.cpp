@@ -42,7 +42,6 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   else
     att = 2, sq1 = e8, sq2 = c8, sq3 = g8;  // 0x2 = b8
 
-
   //                                logical ! on integer means 0 => true else => false  
   bool QueenS = castle[Queenside][SideToMove] && !(getCastleBbs(Queenside, SideToMove) & attacked) && (att & ~getP());
   bool KingS = castle[Kingside][SideToMove] && !(getCastleBbs(Kingside, SideToMove) & attacked);
@@ -53,7 +52,6 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   return list;
 }
 
-//todo double push -> e.p.
 Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask,
                            uint64_t pos, int kingSq) {
   uint64_t promLine = SideToMove == White ? getLines(a7, h7) : getLines(a2, h2);
@@ -62,7 +60,6 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
     uint64_t quiet = PawnMove(from, SideToMove, getP()) & pushMask;
     uint64_t cap = PawnAttack(from, SideToMove) & captureMask;
     uint64_t pinnedLine = fullBb();
-
 
     // drawB(promLine);
     // drawB(cap);
@@ -80,7 +77,8 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, PR_BISHOP);
         *list++ = Move(from, to, PR_ROOK);
         *list++ = Move(from, to, PR_QUEEN);
-      } else
+      }
+      else
         *list++ = Move(from, to, QUIET);
     }
 
@@ -91,7 +89,8 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, PC_BISHOP);
         *list++ = Move(from, to, PC_ROOK);
         *list++ = Move(from, to, PC_QUEEN);
-      } else
+      }
+      else
         *list++ = Move(from, to, CAPTURE);
     }
 
@@ -259,7 +258,9 @@ Move *Board::generateMoves(Move *list) {
   else if (num_checkers == 1) {
     pushMask = getSquaresBetween(lsb(checkers), OuKing);
     captureMask = checkers;
-  } else {
+  }
+
+  else {
     captureMask = getP(!SideToMove);
     pushMask = ~getP();
     list = generateCastles(list, attacked);
@@ -277,17 +278,205 @@ Move *Board::generateMoves(Move *list) {
 
   //drawB(getP(SideToMove, Pawn));
 
-
   return list;
 }
 
-// plays the move m on the board TODO: implement updating history and switch case with moves
+// plays the move m on the board    TODO: test everything from 000 onward
 void Board::play(const Move &m) {
-  SideToMove = !SideToMove;
   ++fullMoves;
   history[fullMoves] = UndoInfo(history[fullMoves - 1]);
-  history[fullMoves].epSq = pop_lsb(epSqBb);
 
+//  playQuiet(Square(m.from()), Square(m.to()));
+
+  switch(m.flags()) {
+    case DOUBLE_PUSH:
+      history[fullMoves].epSq = epSqBb; //TODO: put in genMoves without variable epSqBb
+    case QUIET:
+      playQuiet(Square(m.from()), Square(m.to()));
+      break;
+
+    case OO:
+      playQuiet(Square(m.from()), Square(m.to()));
+      if(SideToMove == White) // king moved alr, so rook has to move too
+        playQuiet(h1, f1);
+      else
+        playQuiet(h8, f8);
+      break;
+
+    case OOO:
+      playQuiet(Square(m.from()), Square(m.to()));
+      if(SideToMove == White) // king moved alr, so rook has to move too
+        playQuiet(a1, d1);
+      else
+        playQuiet(a8, d8);
+      break;
+
+    case CAPTURE:
+      history[fullMoves].captured = Piece(board[m.to()]);
+      removePiece(Square(m.to()));
+      playQuiet(Square(m.from()), Square(m.to()));
+      break;
+
+    case EN_PASSANT:
+      if(SideToMove == White) {
+        history[fullMoves].captured = Piece(board[m.to() + 8]);
+        removePiece(Square(m.to() + 8));   // the same as going one behind (e.g. e6 -> e5) from whites view
+      }
+      else {
+        history[fullMoves].captured = Piece(board[m.to() - 8]);
+        removePiece(Square(m.to() - 8));   // same for black, just vice versa
+      }
+      playQuiet(Square(m.from()), Square(m.to()));
+      break;
+
+    case PR_KNIGHT:
+      removePiece(Square(m.from()));
+      addPiece(Square(m.to()), Knight);
+      break;
+    case PR_BISHOP:
+      removePiece(Square(m.from()));
+      addPiece(Square(m.to()), Bishop);
+      break;
+    case PR_ROOK:
+      removePiece(Square(m.from()));
+      addPiece(Square(m.to()), Rook);
+      break;
+    case PR_QUEEN:
+      removePiece(Square(m.from()));
+      addPiece(Square(m.to()), Queen);
+      break;
+    case PC_KNIGHT:
+      history[fullMoves].captured = Piece(board[m.to()]);
+      removePiece(Square(m.from()));
+      removePiece(Square(m.to()));
+      addPiece(Square(m.to()), Knight);
+      break;
+    case PC_BISHOP:
+      history[fullMoves].captured = Piece(board[m.to()]);
+      removePiece(Square(m.from()));
+      removePiece(Square(m.to()));
+      addPiece(Square(m.to()), Bishop);
+      break;
+    case PC_ROOK:
+      history[fullMoves].captured = Piece(board[m.to()]);
+      removePiece(Square(m.from()));
+      removePiece(Square(m.to()));
+      addPiece(Square(m.to()), Rook);
+      break;
+    case PC_QUEEN:
+      history[fullMoves].captured = Piece(board[m.to()]);
+      removePiece(Square(m.from()));
+      removePiece(Square(m.to()));
+      addPiece(Square(m.to()), Queen);
+      break;
+  }
+
+  SideToMove = !SideToMove;
+}
+
+// plays a quiet move
+void Board::playQuiet(Square from, Square to) {
+  occB[SideToMove] ^= toBb(from) | toBb(to);
+  Piece moved = Piece(board[from]);
+  board[from] = NoPiece;
+  board[to] = moved;
+  Pieces[SideToMove][moved] ^= toBb(from) | toBb(to);
+
+//  drawB(occB[SideToMove]);
+//  cout<<(board[m.from()]) << " " << board[m.to()] <<"\n";
+//  drawB(Pieces[SideToMove][moved]);
+}
+
+// undoes the last move m
+void Board::undo(const Move &m) {
+  SideToMove = !SideToMove;
+  switch(m.flags()) {
+    case DOUBLE_PUSH:
+      epSqBb = 0ull;
+    case QUIET:
+      undoQuiet(Square(m.from()), Square(m.to()));
+      break;
+
+    case OO:
+      undoQuiet(Square(m.from()), Square(m.to()));
+      if(SideToMove == White)
+        undoQuiet(h1, f1), cout<<Square(m.from());
+      else
+        undoQuiet(h8, f8);
+      break;
+
+    case OOO:
+      undoQuiet(Square(m.from()), Square(m.to()));
+      if(SideToMove == White)
+        undoQuiet(a1, d1);
+      else
+        undoQuiet(a8, d8);
+      break;
+
+    case CAPTURE:
+      undoQuiet(Square(m.from()), Square(m.to()));
+      addPiece(Square(m.to()), history[fullMoves].captured);
+      break;
+
+    case EN_PASSANT:
+      undoQuiet(Square(m.from()), Square(m.to()));
+      if(SideToMove == White)
+        addPiece(Square(m.to() + 8), history[fullMoves].captured);
+      else
+        addPiece(Square(m.to() - 8), history[fullMoves].captured);
+      break;
+
+    case PR_KNIGHT:
+    case PR_BISHOP:
+    case PR_ROOK:
+    case PR_QUEEN:
+      addPiece(Square(m.from()), Pawn);
+      removePiece(Square(m.to()));
+      break;
+
+    case PC_KNIGHT:
+    case PC_BISHOP:
+    case PC_ROOK:
+    case PC_QUEEN:
+      addPiece(Square(m.from()), Pawn);
+      removePiece(Square(m.to()));
+      addPiece(Square(m.to()), history[fullMoves].captured);
+      break;
+
+    --fullMoves;
+  }
+}
+
+//undoes last quiet move m
+void Board::undoQuiet(Square from, Square to) {
+  playQuiet(to, from);
+}
+
+void Board::addPiece(Square sq, Piece piece) {
+  addPiece(sq, piece, SideToMove);
+}
+
+void Board::addPiece(Square sq, Piece piece, Color color ) {
+  occB[color] |= toBb(sq);
+  board[sq] = piece;
+  Pieces[color][piece] |= toBb(sq);
+}
+
+
+void Board::removePiece(Square sq) {
+  removePiece(sq, Piece(board[sq]));
+}
+
+//removes a piece
+void Board::removePiece(Square sq, Piece piece) {
+  removePiece(sq, piece, SideToMove);
+}
+
+// if returning the removed piece it could be used in undoQuiet (perfomance difference??)
+void  Board::removePiece(Square sq, Piece piece, Color color) {
+  occB[color] &= ~toBb(sq);
+  board[sq] = NoPiece;
+  Pieces[color][piece] &= ~toBb(sq);
 }
 
 

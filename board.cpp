@@ -8,9 +8,6 @@
 
 using namespace std;
 
-Board::Board() {
-  Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-}
 
 //TODO: migrate epSqBb to history (replace all instances of ep with h[0] or maybe not for better readability
 Board::Board(string s) {
@@ -180,7 +177,7 @@ void Board::setFen(string fen) {
     while (fen[idx + idx2] != ' ')   //cursor in halfmoves clock position
       idx2++;
 
-    halfMovesC = stoi(fen.substr(idx, idx + idx2));
+    history[0].halfmoves = stoi(fen.substr(idx, idx + idx2));
     idx += idx2 + 1;
     fullMoves = stoi(fen.substr(idx, fen.size() - idx)); //what is left in string is fullmoves
   }
@@ -193,6 +190,7 @@ void Board::setArr(char Arr[64], Color color, string castling,
   SideToMove = color;
   epSqBb = 0ull;
   fullMoves = 0;
+  history[0] = UndoInfo();
 
   for (int pos = 0; pos < 64; pos++) {
     char c = Arr[pos];
@@ -321,7 +319,7 @@ void drawB(uint64_t bb, bool showNum) {
           cout << "  ";
         x++;
       } else
-        cout << ((x % 12 < 6 && y % 6 < 3) || ((x % 12 > 5 && y % 6 > 2)) ? "█" : "▒");
+        cout << static_cast<char>((x % 12 < 6 && y % 6 < 3) || ((x % 12 > 5 && y % 6 > 2)) ? 219 : 177);
     }
     cout << "\n";
   }

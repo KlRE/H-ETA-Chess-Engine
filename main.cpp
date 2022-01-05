@@ -9,7 +9,14 @@ using namespace std;
 /* TODO:
    - last: obstructed für pinned pieces (s. firefox) (idk if solved??))
    - move function
-    -
+    - suddenly no castling rights?
+    - add ep square after ep see test5
+
+   - unit tests for:
+      - play
+      - generateMoves, bishop, pawn etc..
+    - finish halfmove clock
+
 
    - adding const and Reference in Parameter of functions (e.g. in attacks.h/.cpp)
 */
