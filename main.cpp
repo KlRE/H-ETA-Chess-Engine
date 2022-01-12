@@ -7,6 +7,7 @@
 using namespace std;
 
 /* TODO:
+ * - bug checkers somehow for fen depth 6 black side always 2, so perft(6) wrong
    - last: obstructed für pinned pieces (s. firefox) (idk if solved??))
    - move function
     - suddenly no castling rights?
@@ -25,10 +26,6 @@ using namespace std;
 
 int main()
 {
-  auto start = chrono::system_clock::now();
   alltests();
-  
-  chrono::duration<double,milli> tm = chrono::system_clock::now() - start;
-  cout<<"Time taken by program: "<<tm.count()<<" ms"<<endl;
 }
 

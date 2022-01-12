@@ -400,7 +400,7 @@ void Board::undo(const Move &m) {
     case OO:
       undoQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == White)
-        undoQuiet(h1, f1), cout<<Square(m.from());
+        undoQuiet(h1, f1);
       else
         undoQuiet(h8, f8);
       break;
@@ -442,9 +442,8 @@ void Board::undo(const Move &m) {
       removePiece(Square(m.to()));
       addPiece(Square(m.to()), history[fullMoves].captured);
       break;
-
-    --fullMoves;
   }
+  --fullMoves;
 }
 
 //undoes last quiet move m

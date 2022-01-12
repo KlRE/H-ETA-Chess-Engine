@@ -8,6 +8,7 @@
 #include "board.h"
 #include "move.h"
 #include "test.h"
+#include "engine.h"
 
 using namespace std;
 
@@ -17,10 +18,10 @@ using namespace std;
 
 void alltests() {
   //test();
-//  test2();
+  //test2();
   // test3();
    //test4();
-  test5();
+  test6();
 }
 
 string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 0";
@@ -183,6 +184,10 @@ void test4() {
 void test5() {
   //testPlay(fen);
   testPlay(perft5);
+}
+
+void test6() {
+  perft(3, fen);
 }
 
 void testPlay(string fen) {

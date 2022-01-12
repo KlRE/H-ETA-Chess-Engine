@@ -23,12 +23,15 @@ struct UndoInfo {
   //double pushed on the previous move
   uint64_t epSq;
 
+  // castle rights for both sides  TODO: implement castle in UndoInfo
+  bool castle[2][2];
+
   UndoInfo() : halfmoves(0), captured(NoPiece), epSq(NoSquare) {}
 	
   //This preserves the entry bitboard across moves
   //edited: no bitboard is
   UndoInfo(const UndoInfo& prev) :
-          halfmoves(prev.halfmoves + 1), captured(NoPiece), epSq(NoSquare) {}
+          halfmoves(prev.halfmoves + 1), captured(NoPiece), epSq(NoSquare){}
 };
 
 
