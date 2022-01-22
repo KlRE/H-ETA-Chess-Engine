@@ -8,30 +8,29 @@
 
 using namespace std;
 
-uint64_t perftRec(int depth, Board &board, uint64_t &nodes, uint64_t &captures, uint64_t &castles, uint64_t &promotions) {
+void perftRec(int depth, Board &board, uint64_t &nodes, uint64_t &captures, uint64_t &castles, uint64_t &promotions) {
   MoveList ml(board);
 
-  if(depth == 1) {
-    return ml.size();
-  }
 
   Move *cursor = ml.begin();
-  uint64_t sum = 0;
 
   while(cursor != ml.end()) {
     //for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
     //cout << *cursor <<"\n";
-    if (cursor->flags() == CAPTURE)  ++captures;
-    else if (cursor->flags() == OO || cursor->flags() == OOO )  ++captures;
-    else if (cursor->flags() >= 0b1000)  ++promotions;  // for reference view Moveflags integers in utility.h
+    if (depth == 0) {
+      if (cursor->flags() == CAPTURE) ++captures;
+      else if (cursor->flags() == OO || cursor->flags() == OOO) ++castles;
+      else if (cursor->flags() >= 0b1000) ++promotions;  // for reference view Moveflags integers in utility.h
+      ++nodes;
+    }
 
     board.play(*cursor);
-    sum += perftRec(depth - 1, board, nodes, captures, castles, promotions);
+    if (depth != 0)
+      perftRec(depth - 1, board, nodes, captures, castles, promotions);
     board.undo(*cursor);
     ++cursor;
-
   }
-  return sum;
+
 }
 
 void perft(int depth, string fen) {
@@ -39,15 +38,16 @@ void perft(int depth, string fen) {
 
   auto start = chrono::system_clock::now();
   Board board(fen);
-  uint64_t nodes = 0, nodes2;
-  uint64_t captures = 0;
-  uint64_t castles = 0;
-  uint64_t promotions = 0;
+  uint64_t nodes, captures, castles, promotions;
 
   for (int i = 1; i <= depth; i++) {
-    nodes2=perftRec(i, board, nodes, captures, castles, promotions);
+    nodes = 0;
+    captures = 0;
+    castles = 0;
+    promotions = 0;
+    perftRec(i, board, nodes, captures, castles, promotions);
     printf("%d Nodes searched for depth %d\nCaptures: %d\nCastles: %d\nPromotions: %d\n",
-           nodes2, i, captures, castles, promotions);
+           nodes, i, captures, castles, promotions);
     board.drawBoard();
   }
 
