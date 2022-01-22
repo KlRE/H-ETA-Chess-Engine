@@ -7,10 +7,11 @@
 using namespace std;
 
 /* TODO:
- * - bug checkers somehow for fen depth 6 black side always 2, so perft(6) wrong
-   - last: obstructed für pinned pieces (s. firefox) (idk if solved??))
+ *  apparently puts pieces back with wrong color
+ *  bug checkers somehow for fen depth 6 black side always 2, so perft(6) wrong
+ *  game continues after mate
+ *  last: obstructed für pinned pieces (s. firefox) (idk if solved??))
    - move function
-    - suddenly no castling rights?
     - add ep square after ep see test5
 
    - unit tests for:

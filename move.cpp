@@ -415,7 +415,7 @@ void Board::undo(const Move &m) {
 
     case CAPTURE:
       undoQuiet(Square(m.from()), Square(m.to()));
-      addPiece(Square(m.to()), history[fullMoves].captured);
+      addPiece(Square(m.to()), history[fullMoves].captured, !SideToMove);
       break;
 
     case EN_PASSANT:

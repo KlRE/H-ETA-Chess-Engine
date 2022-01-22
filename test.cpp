@@ -187,7 +187,9 @@ void test5() {
 }
 
 void test6() {
-  perft(3, fen);
+  perft(4, fen);
+ //perft(2, perft2);
+  perft(3, perft3);
 }
 
 void testPlay(string fen) {

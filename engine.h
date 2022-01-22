@@ -9,7 +9,7 @@ class engine {
 
 };
 
-uint64_t perftRec(int, Board &);
+void perftRec(int depth, Board &board, int &nodes, int &captures, int &castles, int &promotions);
 void perft(int, string);
 
 
