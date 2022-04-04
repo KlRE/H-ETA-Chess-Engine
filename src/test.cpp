@@ -17,7 +17,7 @@ using namespace std;
 */
 
 void alltests() {
-  //test();
+  test();
   //test2();
   // test3();
    //test4();
@@ -178,7 +178,7 @@ void test4() {
   UndoInfo u1;
   UndoInfo u2(u1);
   UndoInfo u3(u2);
-  cout << u2.halfmoves << " " << u3.halfmoves;
+  cout << u2.halfMoves << " " << u3.halfMoves;
 }
 
 void test5() {
@@ -187,7 +187,7 @@ void test5() {
 }
 
 void test6() {
-  perft(4, fen);
+  //perft(4, fen);
  //perft(2, perft2);
   perft(3, perft3);
 }

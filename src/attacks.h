@@ -1,6 +1,7 @@
 #ifndef ATTACKS_H
 #define ATTACKS_H
 
+#include<utility.h>
 
 using namespace std;
 
@@ -67,6 +68,6 @@ void initKing();
    ***************************************** */
 
 uint64_t PawnAttack(int sq, bool color);
-uint64_t PawnMove(int sq, bool color, const uint64_t &occ);
+uint64_t PawnMove(int sq, bool color, const uint64_t &occ, uint64_t &doublePushMask);
 
 #endif

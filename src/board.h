@@ -10,11 +10,12 @@
 using namespace std;
 
 void drawB(uint64_t bb, bool showNum = false);  //TODO: move to utility
+void drawSquareChar(bool black);
 
 //Stores position information which cannot be recovered on undo-ing a move
 struct UndoInfo {
   //number of halfmoves for 50-move-rule
-  int halfmoves;
+  int halfMoves;
 	
   //The piece that was captured on the last move
   Piece captured;
@@ -26,27 +27,30 @@ struct UndoInfo {
   // castle rights for both sides  TODO: implement castle in UndoInfo
   bool castle[2][2];
 
-  UndoInfo() : halfmoves(0), captured(NoPiece), epSq(NoSquare) {}
+  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(NoSquare) {}
 	
   //This preserves the entry bitboard across moves
   //edited: no bitboard is
   UndoInfo(const UndoInfo& prev) :
-          halfmoves(prev.halfmoves + 1), captured(NoPiece), epSq(NoSquare){}
+          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(NoSquare){}
 };
 
 
 class Board
 {
 private:
-  uint64_t occB[2] = {};       // occurenceBoard for b/w, used as blockermask
-  uint64_t Pieces[2][7] = {};  // piecelist for black and white, used to find all pieces of one color TODO: change to lowercase
-  int board[64] = {};          // mailbox representation, used to finding piece on specific square
-  bool castle[2][2] = {};      // castling rights
-  UndoInfo history[256] = {};  // unrecoverable information like ep square
+  static const int MAX_HISTORY = 256;
 
-  Color SideToMove;
-  uint64_t epSqBb;
-  int fullMoves;
+  uint64_t occB[2] = {};       // occurenceBoard for b/w, used as blockermask
+  uint64_t pieces[2][7] = {};  // piecelist for black and white, used to find all pieces of one color
+  int board[64] = {};          // mailbox representation, used to finding piece on specific square
+  bool castle[2][2] = {};      // castling rights castle[Side][Color]
+  UndoInfo history[MAX_HISTORY] = {};  // unrecoverable information like ep square
+
+  Color SideToMove; // side to move
+  uint64_t epSqBb; // en passant square bitboard
+  int startingFullMoves; // half moves since start of game
+  int halfMovesAfterStart; // full moves
 
 public:
   Board() : Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {};
@@ -55,26 +59,35 @@ public:
 
   uint64_t getP() { return occB[0] | occB[1]; }   // returns bitboard with all pieces
   uint64_t getP(Color color){ return occB[color]; }  // returns bitboard with pieces of one color
-  uint64_t getP(Color color, Piece piece) { return Pieces[color][piece]; }  // returns bitboard of piece of one color
+  uint64_t getP(Color color, Piece piece) { return pieces[color][piece]; }  // returns bitboard of piece of one color
 //  Piece pieceOn(int sq) { return Piece(board[sq]); }
 //  void setPiece(int sq, Piece piece) { board[sq] = piece; }
-  
-  vector<Square> PieceSqs(Color color, Piece piece) { return getPos(Pieces[color][piece]); }
+
+
+  vector<Square> PieceSqs(Color color, Piece piece) { return getPos(pieces[color][piece]); }
   
   Color side() {return SideToMove; };
+
+  int getFullMoves() { return startingFullMoves + (halfMovesAfterStart + abs(SideToMove-1)) / 2; }
 
   uint64_t attacksTo(Square sq, Color color); //returns bitboard with squares with pieces attacking square sq
   uint64_t sliderBlockers(Square sq, Color color);
 
   void clearBoard();
-  
+  void resetHistory(); //todo implement
+
   void setPos(int, Piece, Color);
   void setFen(string fen);
+  string toFen();
   void setArr(char Arr[64], Color color, string castling, Square epSq);
   void setColor(Color color) { SideToMove = color; }
-  void setEpSq(int sq) { epSqBb = 1ull<<sq; }
+  void setEpSqFromDoublePush(int sq) { epSqBb = 1ull << (sq + (SideToMove == Color::White ? 8 : -8)); }
   
   void drawBoard();
+
+  // only for debugging
+  // returns if the internal representation of this board is consistent
+  bool checkInternRep();
 
   /* *****************************************
      ************** in move.cpp **********
@@ -107,8 +120,6 @@ public:
   void removePiece(Square sq, Piece piece);
   // removes the piece on Square sq of any color (should be the right one)
   void removePiece(Square sq, Piece piece, Color color);
-
-
 };
 
 

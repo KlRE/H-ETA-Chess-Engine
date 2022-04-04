@@ -502,7 +502,8 @@ uint64_t PawnAttack(int sq, bool color)
   return mask;
 }
 
-uint64_t PawnMove(int sq, bool color, const uint64_t &occ)
+// returns mask with single pushes and writes double pushes in argument
+uint64_t PawnMove(int sq, bool color, const uint64_t &occ, uint64_t &doublePushMask)
 {
   uint64_t mask = 0ull;
   int f = sq / 8;
@@ -511,13 +512,13 @@ uint64_t PawnMove(int sq, bool color, const uint64_t &occ)
     {
       mask |= (1ull << (sq-8) & ~occ);
       if(f == 6 && mask)    //if mask is empty, there is piece blocking the pawn from moving 
-	mask |= (1ull<<(sq-16) & ~occ);
+	      doublePushMask |= (1ull<<(sq-16) & ~occ);
     }
   else
     {
       mask |= (1ull << (sq+8) & ~occ);
       if(f == 1 && mask)    //if mask is empty, there is piece blocking the pawn from moving 
-	mask |= (1ull<<(sq+16) & ~occ);
+	      doublePushMask |= (1ull<<(sq+16) & ~occ);
     }
 
   return mask;

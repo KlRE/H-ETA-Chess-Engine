@@ -51,10 +51,10 @@ uint64_t makeMask(vector<int> v);
 vector<Square> getPos(uint64_t i); // returns positions of all bits, which are on on bitboard
 
 ostream &operator<<(ostream &os, Square sq);
-string printsq(int i);
+string printSq(int i);
 
 ostream &operator<<(ostream &os, Piece p);
-string printShortPiece(Piece p);
+char printShortPiece(Piece p, Color color);
 
 ostream &operator<<(ostream &os, Color color);
 Color operator!(Color color);

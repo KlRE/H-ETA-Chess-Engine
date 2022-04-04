@@ -7,18 +7,21 @@
 
 using namespace std;
 
-// returns the smallest bit of a bitboard as an square
+// returns the smallest bit of a bitboard as an square and pops it from the bitboard
 Square pop_lsb(uint64_t &i) {
   int out = __builtin_ffsll(i);
   i ^= 1ull << (out - 1);  // schneller: i &= i-1
   return Square(out - 1);
 }
 
+
+
 Square strToSq(string s) {
   int col = tolower(s[0]) - 'a';
   int row = 8 - (tolower(s[1]) - '0');
   return Square(row * 8 + col);
 }
+
 
 uint64_t makeMask(vector<int> v) {
   uint64_t out = 0ull;
@@ -63,7 +66,7 @@ string ChessSq[] = {
 
 ostream &operator<<(ostream &os, Square sq) { return os << ChessSq[sq]; }
 
-string printsq(int i)    // prints enum or int of a square as string
+string printSq(int i)    // prints enum or int of a square as string
 {
   return ChessSq[i];
 }
@@ -72,9 +75,9 @@ string pieceName[] = {"NoPiece", "Pawn", "Rook", "Knight", "Bishop", "Queen", "K
 
 ostream &operator<<(ostream &os, Piece p) { return os << pieceName[p]; }
 
-string shortPiece[] = {"", "", "r", "n", "b", "q", "k"};
+char shortPiece[2][7] = {{' ', 'P', 'R', 'N', 'B', 'Q', 'K'}, {' ', 'p', 'r', 'n', 'b', 'q', 'k'}};
 
-string printShortPiece(Piece p) { return shortPiece[p]; }
+char printShortPiece(Piece piece, Color color) { return shortPiece[color][piece]; }
 
 string colors[] = {"White", "Black"};
 
