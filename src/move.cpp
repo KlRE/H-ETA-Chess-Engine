@@ -57,6 +57,7 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
 Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask,
                            uint64_t pos, int kingSq) {
   uint64_t promLine = SideToMove == White ? getLines(a7, h7) : getLines(a2, h2);
+  uint64_t epSqBb = history[halfMovesAfterStart].epSq;
   while (pos) {
     Square from = pop_lsb(pos);
     uint64_t doublePushMask = 0ull;
@@ -73,7 +74,7 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
       pinnedLine = getLines(from, kingSq);
     }
 
-    //quiet |= doublePushMask;
+    quiet |= doublePushMask;
     while (quiet) {
       Square to = pop_lsb(quiet);
       if (toBb(from) & promLine) {
@@ -86,11 +87,11 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, QUIET);
     }
 
-    while(doublePushMask) {
-      //drawB(doublePushMask);
-      Square to = pop_lsb(doublePushMask);
-      *list++ = Move(from, to, DOUBLE_PUSH);
-    }
+//    while(doublePushMask) {
+//      //drawB(doublePushMask);
+//      Square to = pop_lsb(doublePushMask);
+//      *list++ = Move(from, to, DOUBLE_PUSH);
+//    }
 
     while (cap) {
       Square to = pop_lsb(cap);
@@ -301,7 +302,6 @@ void Board::play(const Move &m) {
   switch(m.flags()) {
     case DOUBLE_PUSH:
       setEpSqFromDoublePush(Square(m.to()));
-      history[halfMovesAfterStart].epSq = epSqBb; //TODO: put in genMoves without variable epSqBb
     case QUIET:
       playQuiet(Square(m.from()), Square(m.to()));
       break;
@@ -354,43 +354,44 @@ void Board::play(const Move &m) {
 
     case PR_KNIGHT:
       removePiece(Square(m.from()), Pawn, SideToMove);
-      addPiece(Square(m.to()), Knight);
+      addPiece(Square(m.to()), Knight, SideToMove);
       break;
     case PR_BISHOP:
       removePiece(Square(m.from()), Pawn, SideToMove);
-      addPiece(Square(m.to()), Bishop);
+      addPiece(Square(m.to()), Bishop, SideToMove);
       break;
     case PR_ROOK:
       removePiece(Square(m.from()), Pawn, SideToMove);
-      addPiece(Square(m.to()), Rook);
+      addPiece(Square(m.to()), Rook, SideToMove);
       break;
     case PR_QUEEN:
       removePiece(Square(m.from()), Pawn, SideToMove);
-      addPiece(Square(m.to()), Queen);
+      addPiece(Square(m.to()), Queen, SideToMove);
       break;
+
     case PC_KNIGHT:
       history[halfMovesAfterStart].captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
-      addPiece(Square(m.to()), Knight);
+      addPiece(Square(m.to()), Knight, SideToMove);
       break;
     case PC_BISHOP:
       history[halfMovesAfterStart].captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
-      addPiece(Square(m.to()), Bishop);
+      addPiece(Square(m.to()), Bishop, SideToMove);
       break;
     case PC_ROOK:
       history[halfMovesAfterStart].captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
-      addPiece(Square(m.to()), Rook);
+      addPiece(Square(m.to()), Rook, SideToMove);
       break;
     case PC_QUEEN:
       history[halfMovesAfterStart].captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
-      addPiece(Square(m.to()), Queen);
+      addPiece(Square(m.to()), Queen, SideToMove);
       break;
   }
 
@@ -415,7 +416,7 @@ void Board::undo(const Move &m) {
   SideToMove = !SideToMove;
   switch(m.flags()) {
     case DOUBLE_PUSH:
-      epSqBb = 0ull;
+      //epSqBb = 0ull;
     case QUIET:
       undoQuiet(Square(m.from()), Square(m.to()));
       break;
@@ -444,26 +445,26 @@ void Board::undo(const Move &m) {
     case EN_PASSANT:
       undoQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == White)
-        addPiece(Square(m.to() + 8), history[halfMovesAfterStart].captured);
+        addPiece(Square(m.to() + 8), history[halfMovesAfterStart].captured, !SideToMove);
       else
-        addPiece(Square(m.to() - 8), history[halfMovesAfterStart].captured);
+        addPiece(Square(m.to() - 8), history[halfMovesAfterStart].captured, !SideToMove);
       break;
 
     case PR_KNIGHT:
     case PR_BISHOP:
     case PR_ROOK:
     case PR_QUEEN:
-      addPiece(Square(m.from()), Pawn);
-      removePiece(Square(m.to()), Pawn, SideToMove);
+      addPiece(Square(m.from()), Pawn, SideToMove);
+      removePiece(Square(m.to()), Piece(board[m.to()]), SideToMove);
       break;
 
     case PC_KNIGHT:
     case PC_BISHOP:
     case PC_ROOK:
     case PC_QUEEN:
-      addPiece(Square(m.from()), Pawn);
-      removePiece(Square(m.to()), Pawn, SideToMove);
-      addPiece(Square(m.to()), history[halfMovesAfterStart].captured);
+      addPiece(Square(m.from()), Pawn, SideToMove);
+      removePiece(Square(m.to()), Piece(board[m.to()]), SideToMove);
+      addPiece(Square(m.to()), history[halfMovesAfterStart].captured, !SideToMove);
       break;
   }
   --halfMovesAfterStart;
@@ -475,25 +476,15 @@ void Board::undoQuiet(Square from, Square to) {
   playQuiet(to, from);
 }
 
-void Board::addPiece(Square sq, Piece piece) {
-  addPiece(sq, piece, SideToMove);
-}
+//void Board::addPiece(Square sq, Piece piece) {
+//  addPiece(sq, piece, SideToMove);
+//}
 
 void Board::addPiece(Square sq, Piece piece, Color color ) {
   occB[color] |= toBb(sq);
   board[sq] = piece;
   pieces[color][piece] |= toBb(sq);
 }
-
-////todo very weird arrangment
-//void Board::removePiece(Square sq) {
-//  removePiece(sq, Piece(board[sq]));
-//}
-//
-////removes a piece
-//void Board::removePiece(Square sq, Piece piece) {
-//  removePiece(sq, piece, !SideToMove); // todo whyyyy
-//}
 
 // todo if returning the removed piece it could be used in undoQuiet (perfomance difference??)
 void  Board::removePiece(Square sq, Piece piece, Color color) {

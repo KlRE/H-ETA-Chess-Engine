@@ -31,6 +31,10 @@ bool Board::checkInternRep() {
     for (int j = 1; j < 7; j++) { // for each piece (first piece is noPiece)
       for (int k = j + 1; k < 7; k++) { // with each piece
         if (pieces[i][j] & pieces[i][k]) {
+          drawB(pieces[i][j]);
+          drawB(pieces[i][k]);
+          drawB(allPieceBb);
+          drawB(occB[i]);
           cout << "duplicate piece in color " << Color(i) << " and Pieces: " << Piece(j) << " and " << Piece(k) << ".\n";
           return false;
         }
@@ -54,6 +58,8 @@ bool Board::checkInternRep() {
       if ((toBb(sq) & pieces[i][piece]) == 0) { // if the square is not occupied by the piece
         cout << "Square " <<  printSq(sq) << " in the Occurence Board from Color " << Color(i) << "is not occupied in the "
         << Piece(piece) << " bitboard\n";
+//        drawB(toBb(sq));
+//        drawB(pieces[i][piece]);
         return false;
       }
     }
@@ -100,10 +106,9 @@ void Board::clearBoard() {  // todo maybe replace this in constructor
   fill(&pieces[0][0], &pieces[0][0] + sizeof(pieces) / sizeof(pieces[0][0]), 0);
   fill(board, board + 64, 0);
   fill(&castle[0][0], &castle[0][0] + sizeof(castle) / sizeof(castle[0][0]), 0);
-  fill(history, history + MAX_HISTORY, UndoInfo());
+  history[0] = UndoInfo();
 
   SideToMove = White;
-  epSqBb = 0ull;
   halfMovesAfterStart = 0;
   startingFullMoves = 1;
 }
@@ -214,7 +219,7 @@ void Board::setFen(string fen) {
   idx++;
   //  drawB(toBb(strToSq(string() + fen[idx++] + fen[idx])));
   if (fen[idx] != '-') //cursor in e.p. position
-    epSqBb = toBb(strToSq(string() + fen[idx] + fen[idx + 1])), idx++;
+    history[0].epSq = toBb(strToSq(string() + fen[idx] + fen[idx + 1])), idx++;
 
   if (fen.size() - idx > 2) {
     idx += 2;
@@ -282,8 +287,8 @@ string Board::toFen() {
   }
 
   // add en passant square
-  if (epSqBb != 0ull) {
-    fen += printSq(lsb(epSqBb)) + " ";
+  if (history[halfMovesAfterStart].epSq != 0ull) {
+    fen += printSq(lsb(history[halfMovesAfterStart].epSq)) + " ";
   } else {
     fen += "- ";
   }
@@ -366,7 +371,7 @@ void Board::setArr(char Arr[64], Color color, string castling,
   }
   //  printf("%d %d %d %d\n", castle[1][0],castle[0][0],castle[1][1], castle[0][1]);
 
-  epSqBb = toBb(epSq);
+  history[halfMovesAfterStart].epSq = toBb(epSq);
 }
 
 void Board::drawBoard() {
@@ -414,8 +419,8 @@ void Board::drawBoard() {
   cout << "Castling Rights: " << (castle[Queenside][SideToMove] ? "Queenside " : "")
        << (castle[Kingside][SideToMove] ? "Kingside" : "") << "\n";
 
-  if (epSqBb)
-    cout << "En Passent Square: " << Square(lsb(epSqBb)) << "\n";
+  if (history[halfMovesAfterStart].epSq)
+    cout << "En Passent Square: " << Square(lsb(history[halfMovesAfterStart].epSq)) << "\n";
   else
     cout << "No En Passent Square \n";
 

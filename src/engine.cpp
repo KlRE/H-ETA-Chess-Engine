@@ -14,10 +14,10 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
 
   while(cursor != ml.end()) {
 
-    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
-      cout << *cursor <<"\n";
-    if (__builtin_popcountll (board.getP(Black, King)) != 1)
-      board.drawBoard();
+//    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
+//      cout << *cursor <<"\n";
+//    if (__builtin_popcountll (board.getP(Black, King)) != 1)
+//      board.drawBoard();
 
 
     if (depth == 0) {
@@ -29,7 +29,7 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
     }
 
     board.play(*cursor);
-    board.checkInternRep();
+     board.checkInternRep();  //todo remove if not debug
     if (depth != 0)
       perftRec(depth - 1, board, nodes, captures, castles, promotions, ep);
     board.undo(*cursor);

@@ -2,5 +2,14 @@ cmake_minimum_required(VERSION 3.21)
 project(ChessGit)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXE_LINKER_FLAGS "-static")
 
-add_executable(ChessGit main.cpp attacks.cpp board.cpp move.cpp test.cpp utility.cpp engine.cpp engine.h)
+include_directories(src)
+link_directories(src)
+add_subdirectory(src)
+
+add_executable(ChessGit main.cpp)
+
+target_link_libraries(ChessGit src)
+
+add_subdirectory(Google_Test)

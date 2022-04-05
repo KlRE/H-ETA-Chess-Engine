@@ -12,6 +12,7 @@ using namespace std;
 void drawB(uint64_t bb, bool showNum = false);  //TODO: move to utility
 void drawSquareChar(bool black);
 
+// todo: make history array like stockfish position.h line 197
 //Stores position information which cannot be recovered on undo-ing a move
 struct UndoInfo {
   //number of halfmoves for 50-move-rule
@@ -27,12 +28,12 @@ struct UndoInfo {
   // castle rights for both sides  TODO: implement castle in UndoInfo
   bool castle[2][2];
 
-  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(NoSquare) {}
+  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(0), castle() {}
 	
   //This preserves the entry bitboard across moves
   //edited: no bitboard is
   UndoInfo(const UndoInfo& prev) :
-          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(NoSquare){}
+          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(0) {}//castle = prev.castle;} see stockfish castling in position.cpp
 };
 
 
@@ -48,9 +49,9 @@ private:
   UndoInfo history[MAX_HISTORY] = {};  // unrecoverable information like ep square
 
   Color SideToMove; // side to move
-  uint64_t epSqBb; // en passant square bitboard
+  //uint64_t epSqBb; // en passant square bitboard
   int startingFullMoves; // half moves since start of game
-  int halfMovesAfterStart; // full moves
+  int halfMovesAfterStart; // plys after starting full moves
 
 public:
   Board() : Board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {};
@@ -81,7 +82,7 @@ public:
   string toFen();
   void setArr(char Arr[64], Color color, string castling, Square epSq);
   void setColor(Color color) { SideToMove = color; }
-  void setEpSqFromDoublePush(int sq) { epSqBb = 1ull << (sq + (SideToMove == Color::White ? 8 : -8)); }
+  void setEpSqFromDoublePush(int sq) { history[halfMovesAfterStart].epSq = 1ull << (sq + (SideToMove == Color::White ? 8 : -8)); }
   
   void drawBoard();
 
@@ -109,15 +110,11 @@ public:
   void undo(const Move &m);                          // undoes move m
   void undoQuiet(Square from, Square to);            // undoes quiet move m
 
-  // adds the Piece piece to Square sq with the color of the player, whose turn it is
-  void addPiece(Square sq, Piece piece);
+
   // adds a piece on the square with a specific color
   void addPiece(Square sq, Piece piece, Color color);
 
-  // removes the piece on Square sq of the color of the player, whose turn it is (should be the right one)
-  void removePiece(Square sq);
-  // removes the Piece piece on Square sq of the color of the player, whose turn it is (should be the right one)
-  void removePiece(Square sq, Piece piece);
+
   // removes the piece on Square sq of any color (should be the right one)
   void removePiece(Square sq, Piece piece, Color color);
 };
