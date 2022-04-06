@@ -6,7 +6,6 @@
 #include <string>
 
 #include "utility.h"
-#include "move.h"
 
 using namespace std;
 

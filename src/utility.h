@@ -5,6 +5,8 @@
 
 using namespace std;
 
+class Move;
+
 enum Square : int{
   a8, b8, c8, d8, e8, f8, g8, h8,
   a7, b7, c7, d7, e7, f7, g7, h7,
