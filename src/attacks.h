@@ -16,7 +16,7 @@ void initLines();
 uint64_t getLines(int sq1, int sq2);
 
 void initCastleBbs();
-uint64_t getCastleBbs(Castles castle, Color color);
+uint64_t getCastleBbs(CastlingRights castle, Color color);
 
 /* ********************************
    **********  Bishop  ************

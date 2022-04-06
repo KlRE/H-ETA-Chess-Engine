@@ -1,3 +1,5 @@
+#define NDEBUG
+#include <assert.h>
 #include <string>
 #include <chrono>
 
@@ -24,15 +26,18 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
       if (cursor->flags() & CAPTURE) ++captures;
       else if (cursor->flags() == OO || cursor->flags() == OOO) ++castles;
       else if (cursor->flags() >= 0b1000) ++promotions;  // for reference view Moveflags integers in utility.h
-      else if(cursor->flags() == EN_PASSANT) ++ep;
+      if(cursor->flags() == EN_PASSANT) ++ep;
       ++nodes;
     }
 
-    board.play(*cursor);
-     board.checkInternRep();  //todo remove if not debug
-    if (depth != 0)
+
+
+    if (depth != 0) {
+      board.play(*cursor);
+      assert(board.checkInternRep());
       perftRec(depth - 1, board, nodes, captures, castles, promotions, ep);
-    board.undo(*cursor);
+      board.undo(*cursor);
+    }
     ++cursor;
   }
 

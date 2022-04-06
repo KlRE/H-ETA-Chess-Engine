@@ -105,7 +105,6 @@ void Board::clearBoard() {  // todo maybe replace this in constructor
   fill(occB, occB + 2, 0);
   fill(&pieces[0][0], &pieces[0][0] + sizeof(pieces) / sizeof(pieces[0][0]), 0);
   fill(board, board + 64, 0);
-  fill(&castle[0][0], &castle[0][0] + sizeof(castle) / sizeof(castle[0][0]), 0);
   history[0] = UndoInfo();
 
   SideToMove = WHITE;
@@ -202,16 +201,16 @@ void Board::setFen(string fen) {
     char c = fen[idx++];
     switch (c) {
       case 'K':
-        castle[Kingside][WHITE] = true;
+        history[0].castlingRights |= WHITE_OO;
         break;
       case 'Q':
-        castle[Queenside][WHITE] = true;
+        history[0].castlingRights |= WHITE_OOO;
         break;
       case 'k':
-        castle[Kingside][BLACK] = true;
+        history[0].castlingRights |= BLACK_OO;
         break;
       case 'q':
-        castle[Queenside][BLACK] = true;
+        history[0].castlingRights |= BLACK_OOO;
         break;
     }
   }
@@ -267,20 +266,20 @@ string Board::toFen() {
   fen += string(" ") + (SideToMove == Color::WHITE ? "w " : "b ");
 
   // add when no castling rights
-  if (!castle[Kingside][WHITE] && !castle[Queenside][WHITE] && !castle[Kingside][BLACK] && !castle[Queenside][BLACK]) {
+  if (!canCastle(KING_SIDE, WHITE) && !canCastle(QUEEN_SIDE, WHITE) && !canCastle(KING_SIDE, BLACK) && !canCastle(QUEEN_SIDE, BLACK)) {
     fen += "- ";
   } else {
-    if (castle[Kingside][WHITE]) {
+    if (canCastle(KING_SIDE, WHITE)) {
       fen += "K";
     }
 
-    if (castle[Queenside][WHITE]) {
+    if (canCastle(QUEEN_SIDE, WHITE)) {
       fen += "Q";
     }
-    if (castle[Kingside][BLACK]) {
+    if (canCastle(KING_SIDE, BLACK)) {
       fen += "k";
     }
-    if (castle[Queenside][BLACK]) {
+    if (canCastle(QUEEN_SIDE, BLACK)) {
       fen += "q";
     }
     fen += " ";
@@ -356,16 +355,16 @@ void Board::setArr(char Arr[64], Color color, string castling,
     char c = castling[idx++];
     switch (c) {
       case 'K':
-        castle[Kingside][WHITE] = true;
+        history[halfMovesAfterStart].castlingRights |= WHITE_OO;
         break;
       case 'Q':
-        castle[Queenside][WHITE] = true;
+        history[halfMovesAfterStart].castlingRights |= WHITE_OOO;
         break;
       case 'k':
-        castle[Kingside][BLACK] = true;
+        history[halfMovesAfterStart].castlingRights |= BLACK_OO;
         break;
       case 'q':
-        castle[Queenside][BLACK] = true;
+        history[halfMovesAfterStart].castlingRights |= BLACK_OOO;
         break;
     }
   }
@@ -416,8 +415,8 @@ void Board::drawBoard() {
   }
   cout << "\n";
 
-  cout << "Castling Rights: " << (castle[Queenside][SideToMove] ? "Queenside " : "")
-       << (castle[Kingside][SideToMove] ? "Kingside" : "") << "\n";
+  cout << "Castling Rights: " << (canCastle(QUEEN_SIDE, SideToMove)? "Queenside " : "")
+       << (canCastle(KING_SIDE, SideToMove) ? "Kingside" : "") << "\n";
 
   if (history[halfMovesAfterStart].epSq)
     cout << "En Passent Square: " << Square(lsb(history[halfMovesAfterStart].epSq)) << "\n";

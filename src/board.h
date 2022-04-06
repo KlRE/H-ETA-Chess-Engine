@@ -26,14 +26,14 @@ struct UndoInfo {
   uint64_t epSq;
 
   // castle rights for both sides
-  int castleRights;
+  int castlingRights;
 
-  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(0), castleRights(NO_CASTLING) {}
+  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(0), castlingRights(NO_CASTLING) {}
 	
   //This preserves the entry bitboard across moves
   //edited: no bitboard is
   UndoInfo(const UndoInfo& prev) :
-          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(0), castleRights(prev.castleRights){}
+          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(0), castlingRights(prev.castlingRights){}
 };
 
 
@@ -45,7 +45,7 @@ private:
   uint64_t occB[2] = {};       // occurenceBoard for b/w, used as blockermask
   uint64_t pieces[2][7] = {};  // piecelist for black and white, used to find all pieces of one color
   int board[64] = {};          // mailbox representation, used to finding piece on specific square
-  bool castle[2][2] = {};      // castling rights castle[Side][Color]
+  //bool castle[2][2] = {};      // castling rights castle[Side][Color]
   UndoInfo history[MAX_HISTORY] = {};  // unrecoverable information like ep square
 
   Color SideToMove; // side to move
@@ -61,9 +61,10 @@ public:
   uint64_t getP() { return occB[0] | occB[1]; }   // returns bitboard with all pieces
   uint64_t getP(Color color){ return occB[color]; }  // returns bitboard with pieces of one color
   uint64_t getP(Color color, Piece piece) { return pieces[color][piece]; }  // returns bitboard of piece of one color
-//  Piece pieceOn(int sq) { return Piece(board[sq]); }
-//  void setPiece(int sq, Piece piece) { board[sq] = piece; }
 
+  bool canCastle(CastlingRights cr, Color color) {
+    return color &  CastlingRights(history[halfMovesAfterStart].castlingRights & cr);
+  }
 
   vector<Square> PieceSqs(Color color, Piece piece) { return getPos(pieces[color][piece]); }
   

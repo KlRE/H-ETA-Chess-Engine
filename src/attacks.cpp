@@ -122,7 +122,7 @@ uint64_t Nmask[64], Kmask[64];
 
 uint64_t SquaresBetween[64][64];
 uint64_t Lines[64][64];
-uint64_t CastleBbs[2][2];
+uint64_t CastleBbs[BLACK_OOO + 1][2];
 
 void initAttacks()
 {
@@ -179,13 +179,13 @@ uint64_t getLines(int sq1, int sq2) { return Lines[sq1][sq2]; }
 
 void initCastleBbs()
 {
-  CastleBbs[Queenside][WHITE] = toBb(d1) | toBb(c1);
-  CastleBbs[Kingside][WHITE] = toBb(f1) | toBb(g1);
-  CastleBbs[Queenside][BLACK] = toBb(d8) | toBb(c8);
-  CastleBbs[Kingside][BLACK] = toBb(f8) | toBb(g8);
+  CastleBbs[QUEEN_SIDE][WHITE] = toBb(d1) | toBb(c1);
+  CastleBbs[KING_SIDE][WHITE] = toBb(f1) | toBb(g1);
+  CastleBbs[QUEEN_SIDE][BLACK] = toBb(d8) | toBb(c8);
+  CastleBbs[KING_SIDE][BLACK] = toBb(f8) | toBb(g8);
 }
 
-uint64_t getCastleBbs(Castles castle, Color color) { return CastleBbs[castle][color]; }
+uint64_t getCastleBbs(CastlingRights castle, Color color) { return CastleBbs[castle][color]; }
   
 
 /* ********************************

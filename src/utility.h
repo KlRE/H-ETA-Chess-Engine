@@ -35,8 +35,8 @@ enum MoveFlags : int {
   PC_KNIGHT = 0b1100, PC_BISHOP = 0b1101, PC_ROOK = 0b1110, PC_QUEEN = 0b1111,
 };
 
-enum Castles : bool {Queenside, Kingside };
 
+// stockfish types.h
 enum CastlingRights {
   NO_CASTLING,
   WHITE_OO,
@@ -53,6 +53,7 @@ enum CastlingRights {
   CASTLING_RIGHT_NB = 16
 };
 
+// todo maybe instead of ternary operator with constant bitshifts
 constexpr CastlingRights operator&(Color c, CastlingRights cr) {
   return CastlingRights((c == WHITE ? WHITE_CASTLING : BLACK_CASTLING) & cr);
 }

@@ -40,13 +40,13 @@ Move *Board::generateKingM(Move *list, const uint64_t &attacked, const uint64_t 
 Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   uint64_t att, sq1, sq2, sq3;
   if (SideToMove == WHITE)
-    att = 0x200000000000000, sq1 = e1, sq2 = c1, sq3 = g1;  //0x200000000000000 = b1
+    att = 0x200000000000000, sq1 = e1, sq2 = c1, sq3 = g1;  //0x200000000000000 = b1    todo somehow make static
   else
     att = 2, sq1 = e8, sq2 = c8, sq3 = g8;  // 0x2 = b8
 
   //                                logical ! on integer means 0 => true else => false  
-  bool QueenS = castle[Queenside][SideToMove] && !(getCastleBbs(Queenside, SideToMove) & attacked) && (att & ~getP()); //todo why
-  bool KingS = castle[Kingside][SideToMove] && !(getCastleBbs(Kingside, SideToMove) & attacked);
+  bool QueenS = canCastle(QUEEN_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked) && (att & ~getP()); //todo why
+  bool KingS = canCastle(KING_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked);
 
   if (QueenS) *list++ = Move(sq1, sq2, OOO);
   if (KingS) *list++ = Move(sq1, sq3, OO);
@@ -65,16 +65,13 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
     uint64_t cap = PawnAttack(from, SideToMove) & captureMask;
     uint64_t pinnedLine = fullBb();
 
-    // drawB(promLine);
-    // drawB(cap);
-
     if (toBb(from) & pinned) {
       quiet &= getLines(from, kingSq);
       cap &= getLines(from, kingSq);
       pinnedLine = getLines(from, kingSq);
     }
 
-    quiet |= doublePushMask;
+    //quiet |= doublePushMask;
     while (quiet) {
       Square to = pop_lsb(quiet);
       if (toBb(from) & promLine) {
@@ -87,11 +84,11 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, QUIET);
     }
 
-//    while(doublePushMask) {
-//      //drawB(doublePushMask);
-//      Square to = pop_lsb(doublePushMask);
-//      *list++ = Move(from, to, DOUBLE_PUSH);
-//    }
+    while(doublePushMask) {
+      //drawB(doublePushMask);
+      Square to = pop_lsb(doublePushMask);
+      *list++ = Move(from, to, DOUBLE_PUSH);
+    }
 
     while (cap) {
       Square to = pop_lsb(cap);
@@ -309,13 +306,13 @@ void Board::play(const Move &m) {
     case OO:
       playQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == WHITE) { // king moved alr, so rook has to move too
-        castle[Kingside][WHITE] = false;
-        castle[Queenside][WHITE] = false;
+        history[halfMovesAfterStart].castlingRights &= ~WHITE_OO;
+        history[halfMovesAfterStart].castlingRights &= ~WHITE_OOO;
         playQuiet(h1, f1);
       }
       else {
-        castle[Kingside][BLACK] = false;
-        castle[Queenside][BLACK] = false;
+        history[halfMovesAfterStart].castlingRights &= ~BLACK_OO;
+        history[halfMovesAfterStart].castlingRights &= ~BLACK_OOO;
         playQuiet(h8, f8);
       }
       break;
@@ -323,13 +320,13 @@ void Board::play(const Move &m) {
     case OOO:
       playQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == WHITE) { // king moved alr, so rook has to move too
-        castle[Kingside][WHITE] = false;
-        castle[Queenside][WHITE] = false;
+        history[halfMovesAfterStart].castlingRights &= ~WHITE_OO;
+        history[halfMovesAfterStart].castlingRights &= ~WHITE_OOO;
         playQuiet(a1, d1);
       }
       else {
-        castle[Kingside][BLACK] = false;
-        castle[Queenside][BLACK] = false;
+        history[halfMovesAfterStart].castlingRights &= ~BLACK_OO;
+        history[halfMovesAfterStart].castlingRights &= ~BLACK_OOO;
         playQuiet(a8, d8);
       }
       break;
@@ -416,7 +413,6 @@ void Board::undo(const Move &m) {
   SideToMove = !SideToMove;
   switch(m.flags()) {
     case DOUBLE_PUSH:
-      //epSqBb = 0ull;
     case QUIET:
       undoQuiet(Square(m.from()), Square(m.to()));
       break;
