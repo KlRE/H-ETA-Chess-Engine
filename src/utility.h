@@ -22,7 +22,7 @@ enum Piece : int
   NoPiece, Pawn, Rook, Knight, Bishop, Queen, King
 };
 
-enum Color : bool { White, Black };  //parameter as bool, bc ! operator leads to casting
+enum Color : bool { WHITE, BLACK };  //parameter as bool, bc ! operator leads to casting
 
 enum MoveFlags : int {
   QUIET = 0b0000, DOUBLE_PUSH = 0b0001,
@@ -34,8 +34,27 @@ enum MoveFlags : int {
 };
 
 enum Castles : bool {Queenside, Kingside };
-  
-class Move;
+
+enum CastlingRights {
+  NO_CASTLING,
+  WHITE_OO,
+  WHITE_OOO = WHITE_OO << 1,
+  BLACK_OO  = WHITE_OO << 2,
+  BLACK_OOO = WHITE_OO << 3,
+
+  KING_SIDE      = WHITE_OO  | BLACK_OO,
+  QUEEN_SIDE     = WHITE_OOO | BLACK_OOO,
+  WHITE_CASTLING = WHITE_OO  | WHITE_OOO,
+  BLACK_CASTLING = BLACK_OO  | BLACK_OOO,
+  ANY_CASTLING   = WHITE_CASTLING | BLACK_CASTLING,
+
+  CASTLING_RIGHT_NB = 16
+};
+
+constexpr CastlingRights operator&(Color c, CastlingRights cr) {
+  return CastlingRights((c == WHITE ? WHITE_CASTLING : BLACK_CASTLING) & cr);
+}
+
 
 inline Square lsb(uint64_t i) { return Square(__builtin_ffsll(i)-1); }
 Square pop_lsb(uint64_t &i);

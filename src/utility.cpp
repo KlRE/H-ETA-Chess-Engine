@@ -84,8 +84,8 @@ string colors[] = {"White", "Black"};
 ostream &operator<<(ostream &os, Color color) { return os << colors[color]; }
 
 Color operator!(Color color) {
-  if (color == White) return Black;
-  else return White;
+  if (color == WHITE) return BLACK;
+  else return WHITE;
 }
 
 string Mtype[] = {

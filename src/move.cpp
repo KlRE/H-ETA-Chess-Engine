@@ -39,7 +39,7 @@ Move *Board::generateKingM(Move *list, const uint64_t &attacked, const uint64_t 
 
 Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   uint64_t att, sq1, sq2, sq3;
-  if (SideToMove == White)
+  if (SideToMove == WHITE)
     att = 0x200000000000000, sq1 = e1, sq2 = c1, sq3 = g1;  //0x200000000000000 = b1
   else
     att = 2, sq1 = e8, sq2 = c8, sq3 = g8;  // 0x2 = b8
@@ -56,7 +56,7 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
 
 Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &pushMask, const uint64_t &captureMask,
                            uint64_t pos, int kingSq) {
-  uint64_t promLine = SideToMove == White ? getLines(a7, h7) : getLines(a2, h2);
+  uint64_t promLine = SideToMove == WHITE ? getLines(a7, h7) : getLines(a2, h2);
   uint64_t epSqBb = history[halfMovesAfterStart].epSq;
   while (pos) {
     Square from = pop_lsb(pos);
@@ -108,7 +108,7 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
     // en passant
     if (PawnAttack(from, SideToMove) & epSqBb) {
       uint64_t epLine;   // determining where the square of captured pawn ist
-      if (SideToMove == White)
+      if (SideToMove == WHITE)
         epLine = getLines(a5, h5);
       else
         epLine = getLines(a4, h4);
@@ -308,28 +308,28 @@ void Board::play(const Move &m) {
 
     case OO:
       playQuiet(Square(m.from()), Square(m.to()));
-      if(SideToMove == White) { // king moved alr, so rook has to move too
-        castle[Kingside][White] = false;
-        castle[Queenside][White] = false;
+      if(SideToMove == WHITE) { // king moved alr, so rook has to move too
+        castle[Kingside][WHITE] = false;
+        castle[Queenside][WHITE] = false;
         playQuiet(h1, f1);
       }
       else {
-        castle[Kingside][Black] = false;
-        castle[Queenside][Black] = false;
+        castle[Kingside][BLACK] = false;
+        castle[Queenside][BLACK] = false;
         playQuiet(h8, f8);
       }
       break;
 
     case OOO:
       playQuiet(Square(m.from()), Square(m.to()));
-      if(SideToMove == White) { // king moved alr, so rook has to move too
-        castle[Kingside][White] = false;
-        castle[Queenside][White] = false;
+      if(SideToMove == WHITE) { // king moved alr, so rook has to move too
+        castle[Kingside][WHITE] = false;
+        castle[Queenside][WHITE] = false;
         playQuiet(a1, d1);
       }
       else {
-        castle[Kingside][Black] = false;
-        castle[Queenside][Black] = false;
+        castle[Kingside][BLACK] = false;
+        castle[Queenside][BLACK] = false;
         playQuiet(a8, d8);
       }
       break;
@@ -341,7 +341,7 @@ void Board::play(const Move &m) {
       break;
 
     case EN_PASSANT:
-      if(SideToMove == White) {
+      if(SideToMove == WHITE) {
         history[halfMovesAfterStart].captured = Piece(board[m.to() + 8]);
         removePiece(Square(m.to() + 8), Piece(board[m.to() + 8]), !SideToMove);   // the same as going one behind (e.g. e6 -> e5) from whites view
       }
@@ -423,7 +423,7 @@ void Board::undo(const Move &m) {
 
     case OO:
       undoQuiet(Square(m.from()), Square(m.to()));
-      if(SideToMove == White)
+      if(SideToMove == WHITE)
         undoQuiet(h1, f1);
       else
         undoQuiet(h8, f8);
@@ -431,7 +431,7 @@ void Board::undo(const Move &m) {
 
     case OOO:
       undoQuiet(Square(m.from()), Square(m.to()));
-      if(SideToMove == White)
+      if(SideToMove == WHITE)
         undoQuiet(a1, d1);
       else
         undoQuiet(a8, d8);
@@ -444,7 +444,7 @@ void Board::undo(const Move &m) {
 
     case EN_PASSANT:
       undoQuiet(Square(m.from()), Square(m.to()));
-      if(SideToMove == White)
+      if(SideToMove == WHITE)
         addPiece(Square(m.to() + 8), history[halfMovesAfterStart].captured, !SideToMove);
       else
         addPiece(Square(m.to() - 8), history[halfMovesAfterStart].captured, !SideToMove);

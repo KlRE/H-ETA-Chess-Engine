@@ -107,12 +107,12 @@ void test() {
   // MoveList MM(d);
   // MM.print();
 
-  Board c(bb, White, "KQkq", c6);
+  Board c(bb, WHITE, "KQkq", c6);
   c.drawBoard();
   MoveList M(c);
   M.print();
 
-  Board bb3(t3, Black, "kq", c3);
+  Board bb3(t3, BLACK, "kq", c3);
   bb3.drawBoard();
   MoveList M3(bb3);
   M3.print();

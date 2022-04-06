@@ -6,6 +6,7 @@
 #include <string>
 
 #include "utility.h"
+#include "move.h"
 
 using namespace std;
 
@@ -25,15 +26,15 @@ struct UndoInfo {
   //double pushed on the previous move
   uint64_t epSq;
 
-  // castle rights for both sides  TODO: implement castle in UndoInfo
-  bool castle[2][2];
+  // castle rights for both sides
+  int castleRights;
 
-  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(0), castle() {}
+  UndoInfo() : halfMoves(0), captured(NoPiece), epSq(0), castleRights(NO_CASTLING) {}
 	
   //This preserves the entry bitboard across moves
   //edited: no bitboard is
   UndoInfo(const UndoInfo& prev) :
-          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(0) {}//castle = prev.castle;} see stockfish castling in position.cpp
+          halfMoves(prev.halfMoves + 1), captured(NoPiece), epSq(0), castleRights(prev.castleRights){}
 };
 
 
@@ -82,7 +83,7 @@ public:
   string toFen();
   void setArr(char Arr[64], Color color, string castling, Square epSq);
   void setColor(Color color) { SideToMove = color; }
-  void setEpSqFromDoublePush(int sq) { history[halfMovesAfterStart].epSq = 1ull << (sq + (SideToMove == Color::White ? 8 : -8)); }
+  void setEpSqFromDoublePush(int sq) { history[halfMovesAfterStart].epSq = 1ull << (sq + (SideToMove == Color::WHITE ? 8 : -8)); }
   
   void drawBoard();
 

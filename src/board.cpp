@@ -108,7 +108,7 @@ void Board::clearBoard() {  // todo maybe replace this in constructor
   fill(&castle[0][0], &castle[0][0] + sizeof(castle) / sizeof(castle[0][0]), 0);
   history[0] = UndoInfo();
 
-  SideToMove = White;
+  SideToMove = WHITE;
   halfMovesAfterStart = 0;
   startingFullMoves = 1;
 }
@@ -123,40 +123,40 @@ void Board::setFen(string fen) {
     char c = fen[idx++];
     switch (c) {
       case 'p':
-        setPos(pos, Pawn, Black);
+        setPos(pos, Pawn, BLACK);
         break;
       case 'r':
-        setPos(pos, Rook, Black);
+        setPos(pos, Rook, BLACK);
         break;
       case 'n':
-        setPos(pos, Knight, Black);
+        setPos(pos, Knight, BLACK);
         break;
       case 'b':
-        setPos(pos, Bishop, Black);
+        setPos(pos, Bishop, BLACK);
         break;
       case 'q':
-        setPos(pos, Queen, Black);
+        setPos(pos, Queen, BLACK);
         break;
       case 'k':
-        setPos(pos, King, Black);
+        setPos(pos, King, BLACK);
         break;
       case 'P':
-        setPos(pos, Pawn, White);
+        setPos(pos, Pawn, WHITE);
         break;
       case 'R':
-        setPos(pos, Rook, White);
+        setPos(pos, Rook, WHITE);
         break;
       case 'N':
-        setPos(pos, Knight, White);
+        setPos(pos, Knight, WHITE);
         break;
       case 'B':
-        setPos(pos, Bishop, White);
+        setPos(pos, Bishop, WHITE);
         break;
       case 'Q':
-        setPos(pos, Queen, White);
+        setPos(pos, Queen, WHITE);
         break;
       case 'K':
-        setPos(pos, King, White);
+        setPos(pos, King, WHITE);
         break;
       case '/':    // since pos is incremented everytime
         --pos;
@@ -191,9 +191,9 @@ void Board::setFen(string fen) {
   idx++;
 
   if (fen[idx] == 'b')  //cursor in Black/White position
-    SideToMove = Black;
+    SideToMove = BLACK;
   else
-    SideToMove = White;
+    SideToMove = WHITE;
 
   idx += 2;
 
@@ -202,16 +202,16 @@ void Board::setFen(string fen) {
     char c = fen[idx++];
     switch (c) {
       case 'K':
-        castle[Kingside][White] = true;
+        castle[Kingside][WHITE] = true;
         break;
       case 'Q':
-        castle[Queenside][White] = true;
+        castle[Queenside][WHITE] = true;
         break;
       case 'k':
-        castle[Kingside][Black] = true;
+        castle[Kingside][BLACK] = true;
         break;
       case 'q':
-        castle[Queenside][Black] = true;
+        castle[Queenside][BLACK] = true;
         break;
     }
   }
@@ -241,7 +241,7 @@ string Board::toFen() {
   int empty = 0;
   for (int i = 0; i  < 64; i++) {
     Piece piece = Piece(board[i]);
-    Color color = (pieces[Black][piece] & toBb(i)) ? Color::Black : Color::White;
+    Color color = (pieces[BLACK][piece] & toBb(i)) ? Color::BLACK : Color::WHITE;
     if (piece == NoPiece) {
       empty++;
     } else {
@@ -264,23 +264,23 @@ string Board::toFen() {
   }
 
   // add turn
-  fen += string(" ") + (SideToMove == Color::White ? "w " : "b ");
+  fen += string(" ") + (SideToMove == Color::WHITE ? "w " : "b ");
 
   // add when no castling rights
-  if (!castle[Kingside][White] && !castle[Queenside][White] && !castle[Kingside][Black] && !castle[Queenside][Black]) {
+  if (!castle[Kingside][WHITE] && !castle[Queenside][WHITE] && !castle[Kingside][BLACK] && !castle[Queenside][BLACK]) {
     fen += "- ";
   } else {
-    if (castle[Kingside][White]) {
+    if (castle[Kingside][WHITE]) {
       fen += "K";
     }
 
-    if (castle[Queenside][White]) {
+    if (castle[Queenside][WHITE]) {
       fen += "Q";
     }
-    if (castle[Kingside][Black]) {
+    if (castle[Kingside][BLACK]) {
       fen += "k";
     }
-    if (castle[Queenside][Black]) {
+    if (castle[Queenside][BLACK]) {
       fen += "q";
     }
     fen += " ";
@@ -314,40 +314,40 @@ void Board::setArr(char Arr[64], Color color, string castling,
     char c = Arr[pos];
     switch (c) {
       case 'p':
-        setPos(pos, Pawn, Black);
+        setPos(pos, Pawn, BLACK);
         break;
       case 'r':
-        setPos(pos, Rook, Black);
+        setPos(pos, Rook, BLACK);
         break;
       case 'n':
-        setPos(pos, Knight, Black);
+        setPos(pos, Knight, BLACK);
         break;
       case 'b':
-        setPos(pos, Bishop, Black);
+        setPos(pos, Bishop, BLACK);
         break;
       case 'q':
-        setPos(pos, Queen, Black);
+        setPos(pos, Queen, BLACK);
         break;
       case 'k':
-        setPos(pos, King, Black);
+        setPos(pos, King, BLACK);
         break;
       case 'P':
-        setPos(pos, Pawn, White);
+        setPos(pos, Pawn, WHITE);
         break;
       case 'R':
-        setPos(pos, Rook, White);
+        setPos(pos, Rook, WHITE);
         break;
       case 'N':
-        setPos(pos, Knight, White);
+        setPos(pos, Knight, WHITE);
         break;
       case 'B':
-        setPos(pos, Bishop, White);
+        setPos(pos, Bishop, WHITE);
         break;
       case 'Q':
-        setPos(pos, Queen, White);
+        setPos(pos, Queen, WHITE);
         break;
       case 'K':
-        setPos(pos, King, White);
+        setPos(pos, King, WHITE);
         break;
     }
   }
@@ -356,16 +356,16 @@ void Board::setArr(char Arr[64], Color color, string castling,
     char c = castling[idx++];
     switch (c) {
       case 'K':
-        castle[Kingside][White] = true;
+        castle[Kingside][WHITE] = true;
         break;
       case 'Q':
-        castle[Queenside][White] = true;
+        castle[Queenside][WHITE] = true;
         break;
       case 'k':
-        castle[Kingside][Black] = true;
+        castle[Kingside][BLACK] = true;
         break;
       case 'q':
-        castle[Queenside][Black] = true;
+        castle[Queenside][BLACK] = true;
         break;
     }
   }
@@ -378,30 +378,30 @@ void Board::drawBoard() {
   string BArr[8][8]{};
   vector<Square> pos;
 
-  pos = PieceSqs(Black, Pawn);
+  pos = PieceSqs(BLACK, Pawn);
   for (int i: pos) BArr[i / 8][i % 8] = "pa";
-  pos = PieceSqs(Black, Rook);
+  pos = PieceSqs(BLACK, Rook);
   for (int i: pos) BArr[i / 8][i % 8] = "ro";
-  pos = PieceSqs(Black, Knight);
+  pos = PieceSqs(BLACK, Knight);
   for (int i: pos) BArr[i / 8][i % 8] = "kn";
-  pos = PieceSqs(Black, Bishop);
+  pos = PieceSqs(BLACK, Bishop);
   for (int i: pos) BArr[i / 8][i % 8] = "bi";
-  pos = PieceSqs(Black, Queen);
+  pos = PieceSqs(BLACK, Queen);
   for (int i: pos) BArr[i / 8][i % 8] = "qu";
-  pos = PieceSqs(Black, King);
+  pos = PieceSqs(BLACK, King);
   for (int i: pos) BArr[i / 8][i % 8] = "ki";
 
-  pos = PieceSqs(White, Pawn);
+  pos = PieceSqs(WHITE, Pawn);
   for (int i: pos) BArr[i / 8][i % 8] = "PA";
-  pos = PieceSqs(White, Rook);
+  pos = PieceSqs(WHITE, Rook);
   for (int i: pos) BArr[i / 8][i % 8] = "RO";
-  pos = PieceSqs(White, Knight);
+  pos = PieceSqs(WHITE, Knight);
   for (int i: pos) BArr[i / 8][i % 8] = "KN";
-  pos = PieceSqs(White, Bishop);
+  pos = PieceSqs(WHITE, Bishop);
   for (int i: pos) BArr[i / 8][i % 8] = "BI";
-  pos = PieceSqs(White, Queen);
+  pos = PieceSqs(WHITE, Queen);
   for (int i: pos) BArr[i / 8][i % 8] = "QU";
-  pos = PieceSqs(White, King);
+  pos = PieceSqs(WHITE, King);
   for (int i: pos) BArr[i / 8][i % 8] = "KI";
 
   for (int y = 0; y < 3 * 8; y++) {

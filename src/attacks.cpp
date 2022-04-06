@@ -179,10 +179,10 @@ uint64_t getLines(int sq1, int sq2) { return Lines[sq1][sq2]; }
 
 void initCastleBbs()
 {
-  CastleBbs[Queenside][White] = toBb(d1) | toBb(c1);
-  CastleBbs[Kingside][White] = toBb(f1) | toBb(g1);
-  CastleBbs[Queenside][Black] = toBb(d8) | toBb(c8);
-  CastleBbs[Kingside][Black] = toBb(f8) | toBb(g8);
+  CastleBbs[Queenside][WHITE] = toBb(d1) | toBb(c1);
+  CastleBbs[Kingside][WHITE] = toBb(f1) | toBb(g1);
+  CastleBbs[Queenside][BLACK] = toBb(d8) | toBb(c8);
+  CastleBbs[Kingside][BLACK] = toBb(f8) | toBb(g8);
 }
 
 uint64_t getCastleBbs(Castles castle, Color color) { return CastleBbs[castle][color]; }
@@ -488,7 +488,7 @@ uint64_t PawnAttack(int sq, bool color)
 
   uint64_t mask = 0ull;
 
-  if(color == White)
+  if(color == WHITE)
     {
       if(r > 0) mask |= 1ull << (8*(f-1) + r-1);
       if(r < 7) mask |= 1ull << (8*(f-1) + r+1);
@@ -508,7 +508,7 @@ uint64_t PawnMove(int sq, bool color, const uint64_t &occ, uint64_t &doublePushM
   uint64_t mask = 0ull;
   int f = sq / 8;
   
-  if(color == White)
+  if(color == WHITE)
     {
       mask |= (1ull << (sq-8) & ~occ);
       if(f == 6 && mask)    //if mask is empty, there is piece blocking the pawn from moving 

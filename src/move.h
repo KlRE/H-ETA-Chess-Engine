@@ -5,6 +5,7 @@
 #include <iostream>
 #include "utility.h"
 #include "board.h"
+#include "move.h"
 
 using namespace std;
 
