@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
-#include <iomanip>
 
 #include "utility.h"
 #include "attacks.h"

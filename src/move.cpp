@@ -44,9 +44,9 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   else
     att = 2, sq1 = e8, sq2 = c8, sq3 = g8;  // 0x2 = b8
 
-  //                                logical ! on integer means 0 => true else => false  
-  bool QueenS = canCastle(QUEEN_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked) && (att & ~getP()); //todo why
-  bool KingS = canCastle(KING_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked);
+  //                                logical ! on integer means 0 => true else => false                    no piece can be on b1 or b8 for OOO
+  bool QueenS = canCastle(QUEEN_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked) && (att & ~getP());
+  bool KingS = canCastle(KING_SIDE, SideToMove) && !(getCastleBbs(KING_SIDE, SideToMove) & attacked);
 
   if (QueenS) *list++ = Move(sq1, sq2, OOO);
   if (KingS) *list++ = Move(sq1, sq3, OO);
@@ -84,8 +84,8 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, QUIET);
     }
 
-    while(doublePushMask) {
-      //drawB(doublePushMask);
+    while(doublePushMask & pushMask) {
+      //todo maybe change to if and only lsb
       Square to = pop_lsb(doublePushMask);
       *list++ = Move(from, to, DOUBLE_PUSH);
     }

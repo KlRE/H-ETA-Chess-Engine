@@ -1,4 +1,3 @@
-#define NDEBUG
 #include <assert.h>
 #include <string>
 #include <chrono>
@@ -16,10 +15,10 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
 
   while(cursor != ml.end()) {
 
-//    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
-//      cout << *cursor <<"\n";
-//    if (__builtin_popcountll (board.getP(Black, King)) != 1)
-//      board.drawBoard();
+    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
+      cout << *cursor <<"\n";
+    if (__builtin_popcountll (board.getP(BLACK, King)) != 1)
+      board.drawBoard();
 
 
     if (depth == 0) {
@@ -68,6 +67,7 @@ bool perft(int depth, string fen) {
   cout<<"Time taken by program: "<<tm.count()<<" microseconds\n";
   printf("Speed: %f Nodes/second\n\n ------------------------------------------------------------\n\n", nodes / tm.count() * 1000000);
 
+  // todo return number of nodes for unit test
   return board.checkInternRep();
 }
 
