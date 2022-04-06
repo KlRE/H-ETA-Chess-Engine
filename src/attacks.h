@@ -6,7 +6,6 @@
 using namespace std;
 
 
-
 void initAttacks();
 
 void initSquaresBetween();
@@ -15,8 +14,7 @@ uint64_t getSquaresBetween(int sq1, int sq2);
 void initLines();
 uint64_t getLines(int sq1, int sq2);
 
-void initCastleBbs();
-uint64_t getCastleBbs(CastlingRights castle, Color color);
+
 
 /* ********************************
    **********  Bishop  ************

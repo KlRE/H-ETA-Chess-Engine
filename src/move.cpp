@@ -289,13 +289,19 @@ Move *Board::generateMoves(Move *list) {
   return list;
 }
 
-// plays the move m on the board    TODO: test everything from 000 onward
+// plays the move m on the board    stockfish somehow only with ifs and weird structure
 void Board::play(const Move &m) {
   ++halfMovesAfterStart;
-  history[halfMovesAfterStart] = UndoInfo(history[halfMovesAfterStart - 1]);
-  if (board[m.from()] == Piece::Pawn || m.flags() & CAPTURE)
-      history[halfMovesAfterStart].halfMoves = 0;
 
+  history[halfMovesAfterStart] = UndoInfo(history[halfMovesAfterStart - 1]);
+  UndoInfo undoInfo = history[halfMovesAfterStart];
+
+  if (board[m.from()] == Piece::Pawn || m.flags() & CAPTURE)
+      undoInfo.halfMoves = 0;
+
+//  if (undoInfo.castlingRights && (getCastlingMask(m.to()) | getCastlingMask(m.from())));
+//    undoInfo.castlingRights &= ~(getCastlingMask(m.to()) | getCastlingMask(m.from()));
+  
   switch(m.flags()) {
     case DOUBLE_PUSH:
       setEpSqFromDoublePush(Square(m.to()));
@@ -306,13 +312,13 @@ void Board::play(const Move &m) {
     case OO:
       playQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == WHITE) { // king moved alr, so rook has to move too
-        history[halfMovesAfterStart].castlingRights &= ~WHITE_OO;
-        history[halfMovesAfterStart].castlingRights &= ~WHITE_OOO;
+        undoInfo.castlingRights &= ~WHITE_OO;
+        undoInfo.castlingRights &= ~WHITE_OOO;
         playQuiet(h1, f1);
       }
       else {
-        history[halfMovesAfterStart].castlingRights &= ~BLACK_OO;
-        history[halfMovesAfterStart].castlingRights &= ~BLACK_OOO;
+        undoInfo.castlingRights &= ~BLACK_OO;
+        undoInfo.castlingRights &= ~BLACK_OOO;
         playQuiet(h8, f8);
       }
       break;
@@ -320,30 +326,30 @@ void Board::play(const Move &m) {
     case OOO:
       playQuiet(Square(m.from()), Square(m.to()));
       if(SideToMove == WHITE) { // king moved alr, so rook has to move too
-        history[halfMovesAfterStart].castlingRights &= ~WHITE_OO;
-        history[halfMovesAfterStart].castlingRights &= ~WHITE_OOO;
+        undoInfo.castlingRights &= ~WHITE_OO;
+        undoInfo.castlingRights &= ~WHITE_OOO;
         playQuiet(a1, d1);
       }
       else {
-        history[halfMovesAfterStart].castlingRights &= ~BLACK_OO;
-        history[halfMovesAfterStart].castlingRights &= ~BLACK_OOO;
+        undoInfo.castlingRights &= ~BLACK_OO;
+        undoInfo.castlingRights &= ~BLACK_OOO;
         playQuiet(a8, d8);
       }
       break;
 
     case CAPTURE:
-      history[halfMovesAfterStart].captured = Piece(board[m.to()]);
+      undoInfo.captured = Piece(board[m.to()]);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
       playQuiet(Square(m.from()), Square(m.to()));
       break;
 
     case EN_PASSANT:
       if(SideToMove == WHITE) {
-        history[halfMovesAfterStart].captured = Piece(board[m.to() + 8]);
+        undoInfo.captured = Piece(board[m.to() + 8]);
         removePiece(Square(m.to() + 8), Piece(board[m.to() + 8]), !SideToMove);   // the same as going one behind (e.g. e6 -> e5) from whites view
       }
       else {
-        history[halfMovesAfterStart].captured = Piece(board[m.to() - 8]);
+        undoInfo.captured = Piece(board[m.to() - 8]);
         removePiece(Square(m.to() - 8), Piece(board[m.to() - 8]), !SideToMove);   // same for black, just vice versa
       }
       playQuiet(Square(m.from()), Square(m.to()));
@@ -367,25 +373,25 @@ void Board::play(const Move &m) {
       break;
 
     case PC_KNIGHT:
-      history[halfMovesAfterStart].captured = Piece(board[m.to()]);
+      undoInfo.captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
       addPiece(Square(m.to()), Knight, SideToMove);
       break;
     case PC_BISHOP:
-      history[halfMovesAfterStart].captured = Piece(board[m.to()]);
+      undoInfo.captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
       addPiece(Square(m.to()), Bishop, SideToMove);
       break;
     case PC_ROOK:
-      history[halfMovesAfterStart].captured = Piece(board[m.to()]);
+      undoInfo.captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
       addPiece(Square(m.to()), Rook, SideToMove);
       break;
     case PC_QUEEN:
-      history[halfMovesAfterStart].captured = Piece(board[m.to()]);
+      undoInfo.captured = Piece(board[m.to()]);
       removePiece(Square(m.from()), Pawn, SideToMove);
       removePiece(Square(m.to()), Piece(board[m.to()]), !SideToMove);
       addPiece(Square(m.to()), Queen, SideToMove);

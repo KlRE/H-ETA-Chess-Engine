@@ -1,3 +1,4 @@
+#define NDEBUG
 #include <assert.h>
 #include <string>
 #include <chrono>
@@ -15,8 +16,8 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
 
   while(cursor != ml.end()) {
 
-    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
-      cout << *cursor <<"\n";
+//    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
+//      cout << *cursor <<"\n";
     if (__builtin_popcountll (board.getP(BLACK, King)) != 1)
       board.drawBoard();
 

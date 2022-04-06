@@ -7,6 +7,33 @@
 
 using namespace std;
 
+//todo move to types or something
+int castlingMasks[64];
+uint64_t CastleBbs[BLACK_OOO + 1][2];
+
+CastlingRights getCastlingMask(int square) {
+    return CastlingRights(castlingMasks[square]);
+}
+
+uint64_t getCastleBbs(CastlingRights castle, Color color) { return CastleBbs[castle][color]; }
+
+void initCastleBbs()
+{
+  CastleBbs[QUEEN_SIDE][WHITE] = toBb(d1) | toBb(c1);
+  CastleBbs[KING_SIDE][WHITE] = toBb(f1) | toBb(g1);
+  CastleBbs[QUEEN_SIDE][BLACK] = toBb(d8) | toBb(c8);
+  CastleBbs[KING_SIDE][BLACK] = toBb(f8) | toBb(g8);
+
+  castlingMasks[a8] = BLACK_OOO;
+  castlingMasks[e8] = BLACK_CASTLING;
+  castlingMasks[h8] = BLACK_OO;
+  castlingMasks[a1] = WHITE_OOO;
+  castlingMasks[e1] = WHITE_CASTLING;
+  castlingMasks[h1] = WHITE_OO;
+}
+
+
+
 // returns the smallest bit of a bitboard as an square and pops it from the bitboard
 Square pop_lsb(uint64_t &i) {
   int out = __builtin_ffsll(i);

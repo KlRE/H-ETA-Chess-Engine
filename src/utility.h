@@ -53,11 +53,15 @@ enum CastlingRights {
   CASTLING_RIGHT_NB = 16
 };
 
+
 // todo maybe instead of ternary operator with constant bitshifts
 constexpr CastlingRights operator&(Color c, CastlingRights cr) {
   return CastlingRights((c == WHITE ? WHITE_CASTLING : BLACK_CASTLING) & cr);
 }
+CastlingRights getCastlingMask(int square);
+uint64_t getCastleBbs(CastlingRights castle, Color color);
 
+void initCastleBbs();
 
 inline Square lsb(uint64_t i) { return Square(__builtin_ffsll(i)-1); }
 Square pop_lsb(uint64_t &i);
