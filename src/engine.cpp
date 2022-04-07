@@ -1,4 +1,4 @@
-#define NDEBUG
+//#define NDEBUG
 #include <assert.h>
 #include <string>
 #include <chrono>
@@ -19,13 +19,13 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
 //    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
 //      cout << *cursor <<"\n";
     if (__builtin_popcountll (board.getP(BLACK, King)) != 1)
-      board.drawBoard();
+      board.drawBoard(), assert(false);
 
 
     if (depth == 0) {
       if (cursor->flags() & CAPTURE) ++captures;
       else if (cursor->flags() == OO || cursor->flags() == OOO) ++castles;
-      else if (cursor->flags() >= 0b1000) ++promotions;  // for reference view Moveflags integers in utility.h
+      if (cursor->flags() >= 0b1000) ++promotions;  // for reference view Moveflags integers in utility.h
       if(cursor->flags() == EN_PASSANT) ++ep;
       ++nodes;
     }

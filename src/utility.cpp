@@ -9,7 +9,7 @@ using namespace std;
 
 //todo move to types or something
 int castlingMasks[64];
-uint64_t CastleBbs[BLACK_OOO + 1][2];
+uint64_t CastleBbs[QUEEN_SIDE + 1][2];
 
 CastlingRights getCastlingMask(int square) {
     return CastlingRights(castlingMasks[square]);

@@ -1,9 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <chrono>					   // only for taking record of time taken by program
-#include <Windows.h>
-
 #include "src/test.h"
+#include "board.h"
+#include "move.h"
 
 using namespace std;
 
@@ -25,9 +22,20 @@ using namespace std;
 
 
 
-int main()
+int main(int argc, char* argv[])
 {
-  //SetConsoleOutputCP(CP_UTF8);
   alltests();
+  int depth = stoi(string(argv[1]));
+  string fen = string(argv[2]);
+  Board board(fen);
+  if (argc > 3) {
+    argc -= 3;
+    while(--argc) {
+      string move = string(argv[argc]);
+      board.play(Move(move));
+    }
+  }
+  MoveList ml(board);
+  ml.print();
 }
 

@@ -48,6 +48,7 @@ Move *Board::generateCastles(Move *list, const uint64_t &attacked) {
   bool QueenS = canCastle(QUEEN_SIDE, SideToMove) && !(getCastleBbs(QUEEN_SIDE, SideToMove) & attacked) && (att & ~getP());
   bool KingS = canCastle(KING_SIDE, SideToMove) && !(getCastleBbs(KING_SIDE, SideToMove) & attacked);
 
+  //drawB(attacked);
   if (QueenS) *list++ = Move(sq1, sq2, OOO);
   if (KingS) *list++ = Move(sq1, sq3, OO);
 
@@ -271,7 +272,7 @@ Move *Board::generateMoves(Move *list) {
   else {
     captureMask = getP(!SideToMove);
     pushMask = ~getP();
-    list = generateCastles(list, attacked);
+    list = generateCastles(list, attacked | getP(!SideToMove));
   }
 
   uint64_t pinned = sliderBlockers(OuKing, SideToMove);   // pinned pieces
@@ -294,14 +295,14 @@ void Board::play(const Move &m) {
   ++halfMovesAfterStart;
 
   history[halfMovesAfterStart] = UndoInfo(history[halfMovesAfterStart - 1]);
-  UndoInfo undoInfo = history[halfMovesAfterStart];
+  UndoInfo &undoInfo = history[halfMovesAfterStart];
 
   if (board[m.from()] == Piece::Pawn || m.flags() & CAPTURE)
       undoInfo.halfMoves = 0;
 
-//  if (undoInfo.castlingRights && (getCastlingMask(m.to()) | getCastlingMask(m.from())));
-//    undoInfo.castlingRights &= ~(getCastlingMask(m.to()) | getCastlingMask(m.from()));
-  
+  if (undoInfo.castlingRights && (getCastlingMask(m.to()) | getCastlingMask(m.from())));
+    undoInfo.castlingRights &= ~(getCastlingMask(m.to()) | getCastlingMask(m.from()));
+
   switch(m.flags()) {
     case DOUBLE_PUSH:
       setEpSqFromDoublePush(Square(m.to()));

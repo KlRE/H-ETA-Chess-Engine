@@ -35,6 +35,7 @@ bool Board::checkInternRep() {
           drawB(pieces[i][k]);
           drawB(allPieceBb);
           drawB(occB[i]);
+          drawBoard();
           cout << "duplicate piece in color " << Color(i) << " and Pieces: " << Piece(j) << " and " << Piece(k) << ".\n";
           return false;
         }
@@ -44,6 +45,7 @@ bool Board::checkInternRep() {
     if (allPieceBb != occB[i]) {
       drawB(allPieceBb);
       drawB(occB[i]);
+      drawBoard();
       cout << "Piece bitboards don't match the occurrence board of Color "  << Color(i) << ".\n";
       return false;
     }
@@ -58,8 +60,9 @@ bool Board::checkInternRep() {
       if ((toBb(sq) & pieces[i][piece]) == 0) { // if the square is not occupied by the piece
         cout << "Square " <<  printSq(sq) << " in the Occurence Board from Color " << Color(i) << "is not occupied in the "
         << Piece(piece) << " bitboard\n";
-//        drawB(toBb(sq));
-//        drawB(pieces[i][piece]);
+        drawB(toBb(sq));
+        drawB(pieces[i][piece]);
+        drawBoard();
         return false;
       }
     }
