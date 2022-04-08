@@ -88,7 +88,8 @@ Color operator!(Color color);
 ostream &operator<<(ostream &os, MoveFlags mv);
 string printMty(int i);
 
-
-
 int popcount(uint64_t i);
+
+void dividePerftOutput();
+
 #endif

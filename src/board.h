@@ -58,11 +58,13 @@ public:
   Board(string s);
   Board(char Arr[64], Color color, string castling, Square epSq) { setArr(Arr, color, castling, epSq); }
 
-  uint64_t getP() { return occB[0] | occB[1]; }   // returns bitboard with all pieces
-  uint64_t getP(Color color){ return occB[color]; }  // returns bitboard with pieces of one color
-  uint64_t getP(Color color, Piece piece) { return pieces[color][piece]; }  // returns bitboard of piece of one color
+  uint64_t getP() const { return occB[0] | occB[1]; }   // returns bitboard with all pieces
+  uint64_t getP(Color color) const { return occB[color]; }  // returns bitboard with pieces of one color
+  uint64_t getP(Color color, Piece piece) const { return pieces[color][piece]; }  // returns bitboard of piece of one color
+  Piece getPieceOn(int sq) const { return (Piece)board[sq]; }  // returns piece on square
+  Color getSideToMove() const { return SideToMove; }
 
-  bool canCastle(CastlingRights cr, Color color) {
+  bool canCastle(CastlingRights cr, Color color) const {
     return color &  CastlingRights(history[halfMovesAfterStart].castlingRights & cr);
   }
 

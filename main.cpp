@@ -1,6 +1,13 @@
+#include <iostream>
+#include <string>
+
 #include "src/test.h"
+#include "utility.h"
 #include "board.h"
+#include "attacks.h"
 #include "move.h"
+#include "engine.h"
+
 
 using namespace std;
 
@@ -22,20 +29,33 @@ using namespace std;
 
 
 
-int main(int argc, char* argv[])
-{
-  alltests();
+int main(int argc, char *argv[]) {
+  //alltests();
+  initAttacks();
+
   int depth = stoi(string(argv[1]));
-  string fen = string(argv[2]);
-  Board board(fen);
-  if (argc > 3) {
-    argc -= 3;
-    while(--argc) {
-      string move = string(argv[argc]);
-      board.play(Move(move));
-    }
+  string fen = argv[2];
+  //cout << depth;
+  Board board((string)fen);
+  for(int i = 3; i < argc; i++) {
+    Move move((string)argv[i], board);
+    board.play(Move((string)argv[i], board));
   }
+
   MoveList ml(board);
-  ml.print();
+  Move *cursor = ml.begin();
+  string output[ml.size()];
+
+  for(int i = 0; i < ml.size(); ++cursor, ++i) {
+    board.play(*cursor);
+    output[i] = printSq(cursor->from()) + printSq(cursor->to()) + " " + to_string(perft(depth - 1, board, false));
+    board.undo(*cursor);
+  }
+
+  sort(output, output + ml.size());
+  for (string s : output) cout << s << "\n";
+
+  cout << "\n" << perft(depth, board, false) << "\n";
+
 }
 

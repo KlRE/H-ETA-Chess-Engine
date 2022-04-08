@@ -70,6 +70,7 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
       quiet &= getLines(from, kingSq);
       cap &= getLines(from, kingSq);
       pinnedLine = getLines(from, kingSq);
+      doublePushMask &= getLines(from, kingSq);
     }
 
     //quiet |= doublePushMask;
@@ -276,7 +277,6 @@ Move *Board::generateMoves(Move *list) {
   }
 
   uint64_t pinned = sliderBlockers(OuKing, SideToMove);   // pinned pieces
-
 
   //Pawn Moves
   list = generatePawnM(list, pinned, pushMask, captureMask, getP(SideToMove, Pawn), OuKing);

@@ -1,9 +1,11 @@
 #include <cstdint>
 #include <vector>
-#include <iostream>
+#include <sstream>
 
 #include "utility.h"
-
+#include "board.h"
+#include "move.h"
+#include "engine.h"
 
 using namespace std;
 
@@ -130,3 +132,29 @@ string printMty(int i) { return Mtype[i]; }
 
 
 int popcount(uint64_t i) { return __builtin_popcountll(i); }
+
+void dividePerftOutput() {
+  initAttacks();
+  string depthStr, fen, moves;
+  getline(cin, depthStr);
+  getline(cin, fen);
+  getline(cin, moves);
+  int depth = stoi(depthStr);
+  Board board(fen);
+  string moveStr;
+  istringstream iss(moves);
+
+  while (iss >> moveStr) {
+    board.play(Move(moveStr, board));
+  }
+
+  MoveList ml(board);
+  Move *cursor = ml.begin();
+  while(cursor != ml.end()) {
+    board.play(*cursor);
+    cout << cursor->from() << cursor->to() << " " << perft(depth - 1, board, false) << "\n";
+    board.undo(*cursor);
+    ++cursor;
+  }
+  cout << "\n" << perft(depth, board, false) << "\n";
+}
