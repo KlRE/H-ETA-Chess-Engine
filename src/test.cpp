@@ -11,10 +11,6 @@
 
 using namespace std;
 
-/* TODO:
-   - testing ep. function
-*/
-
 void alltests() {
   test();
   //test2();
@@ -87,7 +83,6 @@ char t3[64] = {'r', ' ', ' ', ' ', ' ', ' ', ' ', 'r', // 8
 //               A    B    C    D    E    F    G    H
 
 
-// TODO: e.p. square after double push
 
 void test() {
   initAttacks();

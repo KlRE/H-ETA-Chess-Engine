@@ -74,8 +74,8 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
     }
 
     //quiet |= doublePushMask;
-    while (quiet) {
-      Square to = pop_lsb(quiet);
+    if (quiet) {
+      Square to = lsb(quiet);
       if (toBb(from) & promLine) {
         *list++ = Move(from, to, PR_KNIGHT);
         *list++ = Move(from, to, PR_BISHOP);
@@ -86,9 +86,8 @@ Move *Board::generatePawnM(Move *list, const uint64_t &pinned, const uint64_t &p
         *list++ = Move(from, to, QUIET);
     }
 
-    while(doublePushMask & pushMask) {
-      //todo maybe change to if and only lsb
-      Square to = pop_lsb(doublePushMask);
+    if(doublePushMask & pushMask) {
+      Square to = lsb(doublePushMask);
       *list++ = Move(from, to, DOUBLE_PUSH);
     }
 
@@ -223,33 +222,44 @@ Move *Board::generateQueenM(Move *list, const uint64_t &pinned, const uint64_t &
 
 
 Move *Board::generateMoves(Move *list) {
-  uint64_t attacked = 0ull;
-  uint64_t temp, tempAtt;    // temp bitboard and temp for attacks
+  uint64_t attacked = 0ull, temp;
+  Square OpKing = lsb(getP(!SideToMove, King));
+  Square OuKing = lsb(getP(SideToMove, King));
 
-  // Opponent Pawn Attacks
-  vector<Square> OpPawn = PieceSqs(!SideToMove,
-                                   Pawn);   //todo maybe remove the conversion to vector and doing it with while(bitboard) pop_lsb(bitboard) (s. surge-master)
-  //  for(Square s:OpPawn)cout<<s<<" ";
-  vector<Square> OpRook = PieceSqs(!SideToMove, Rook);
-  vector<Square> OpKnight = PieceSqs(!SideToMove, Knight);
-  vector<Square> OpBishop = PieceSqs(!SideToMove, Bishop);
-  vector<Square> OpQueen = PieceSqs(!SideToMove, Queen);
-  Square OpKing = PieceSqs(!SideToMove, King)[0];
-
-  Square OuKing = PieceSqs(SideToMove, King)[0];
   uint64_t allPwoK = getP() & ~(1ull << OuKing); // bitboard with all Pieces except King of Playing side
-  // drawB(allPwoK);
+  // Opponent Attacks
+  temp = getP(!SideToMove, Pawn);
+  while(temp) {
+    Square from = pop_lsb(temp);
+    attacked |= PawnAttack(from, !SideToMove);
+  }
 
-  for (int i: OpPawn) attacked |= PawnAttack(i, !SideToMove);
-  for (int i: OpRook) attacked |= mRook(i, allPwoK);
-  for (int i: OpKnight) attacked |= KnightAttack(i);
-  for (int i: OpBishop) attacked |= mBishop(i, allPwoK);
-  for (int i: OpQueen) attacked |= mQueen(i, allPwoK);
+  temp = getP(!SideToMove, Knight);
+  while(temp) {
+    Square from = pop_lsb(temp);
+    attacked |= KnightAttack(from);
+  }
+
+  temp = getP(!SideToMove, Rook);
+  while(temp) {
+    Square from = pop_lsb(temp);
+    attacked |= mRook(from, allPwoK);
+  }
+
+  temp = getP(!SideToMove, Bishop);
+  while(temp) {
+    Square from = pop_lsb(temp);
+    attacked |= mBishop(from, allPwoK);
+  }
+
+  temp = getP(!SideToMove, Queen);
+  while(temp) {
+    Square from = pop_lsb(temp);
+    attacked |= mQueen(from, allPwoK);
+  }
 
   attacked |= KingAttack(OpKing);
   attacked |= getP(SideToMove);  //Pieces of opponent are either capturable or attacked by other opp pieces
-
-  //drawB(attacked);
 
   list = generateKingM(list, attacked, getP(!SideToMove), OuKing);
 
@@ -260,7 +270,7 @@ Move *Board::generateMoves(Move *list) {
   uint64_t captureMask;
   uint64_t pushMask;
 
-  int num_checkers = popcount(checkers);
+  int num_checkers = pop_cntll(checkers);
 
   if (num_checkers > 1)
     return list;
@@ -405,14 +415,10 @@ void Board::play(const Move &m) {
 // plays a quiet move
 void Board::playQuiet(Square from, Square to) {
   occB[SideToMove] ^= toBb(from) | toBb(to);
-  Piece moved = Piece(board[from]);  // todo delete this
+  Piece moved = Piece(board[from]);  // save the piece that moved
   board[from] = NoPiece;
   board[to] = moved;
   pieces[SideToMove][moved] ^= toBb(from) | toBb(to);
-
-//  drawB(occB[SideToMove]);
-//  cout<<(board[m.from()]) << " " << board[m.to()] <<"\n";
-//  drawB(Pieces[SideToMove][moved]);
 }
 
 // undoes the last move m
@@ -479,17 +485,13 @@ void Board::undoQuiet(Square from, Square to) {
   playQuiet(to, from);
 }
 
-//void Board::addPiece(Square sq, Piece piece) {
-//  addPiece(sq, piece, SideToMove);
-//}
-
 void Board::addPiece(Square sq, Piece piece, Color color ) {
   occB[color] |= toBb(sq);
   board[sq] = piece;
   pieces[color][piece] |= toBb(sq);
 }
 
-// todo if returning the removed piece it could be used in undoQuiet (perfomance difference??)
+// todo if returning the removed piece it could be used in undoQuiet (perfomance difference??) --wtf??
 void  Board::removePiece(Square sq, Piece piece, Color color) {
   occB[color] &= ~toBb(sq);
   board[sq] = NoPiece;

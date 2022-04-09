@@ -39,11 +39,10 @@ void initCastleBbs()
 // returns the smallest bit of a bitboard as an square and pops it from the bitboard
 Square pop_lsb(uint64_t &i) {
   int out = __builtin_ffsll(i);
-  i ^= 1ull << (out - 1);  // schneller: i &= i-1
+  i &= i - 1;
+  //i ^= 1ull << (out - 1);  // schneller: i &= i-1
   return Square(out - 1);
 }
-
-
 
 Square strToSq(string s) {
   int col = tolower(s[0]) - 'a';
@@ -129,9 +128,6 @@ string Mtype[] = {
 ostream &operator<<(ostream &os, MoveFlags mv) { return os << Mtype[mv]; }
 
 string printMty(int i) { return Mtype[i]; }
-
-
-int popcount(uint64_t i) { return __builtin_popcountll(i); }
 
 void dividePerftOutput() {
   initAttacks();

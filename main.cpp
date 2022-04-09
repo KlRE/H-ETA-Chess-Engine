@@ -32,6 +32,13 @@ using namespace std;
 int main(int argc, char *argv[]) {
   //alltests();
   initAttacks();
+  //perft(5, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
+  Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  iterativeDeepening(board, 10);
+}
+
+
+/*
 
   int depth = stoi(string(argv[1]));
   string fen = argv[2];
@@ -56,6 +63,4 @@ int main(int argc, char *argv[]) {
   for (string s : output) cout << s << "\n";
 
   cout << "\n" << perft(depth, board, false) << "\n";
-
-}
-
+*/

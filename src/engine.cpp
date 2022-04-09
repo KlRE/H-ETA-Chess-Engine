@@ -10,6 +10,61 @@
 
 using namespace std;
 
+Move findBest(int depth, Board &board, int &bestScore) {
+    Move bestMove;
+    MoveList ml(board);
+    Move *cursor = ml.begin();
+    Color color = board.getSideToMove();
+    while (cursor != ml.end()) {
+        board.play(*cursor);
+        int score = alphaBeta(depth - 1, board, -INF, INF);
+        board.undo(*cursor);
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = *cursor;
+        }
+        cursor++;
+    }
+    return bestMove;
+}
+void iterativeDeepening(string fen, int depth) {
+    Board board(fen);
+    iterativeDeepening(board, depth);
+}
+
+void iterativeDeepening(Board &board, int maxDepth) {
+    for (int depth = 1; depth <= maxDepth; depth++) {
+        auto start = chrono::system_clock::now();
+        int score = -INF;
+        Move move = findBest(depth, board, score);
+
+        cout << "Depth: " << depth << " Score: " << score << " Move: " << move << endl;
+        chrono::duration<double, milli> tm = chrono::system_clock::now() - start;
+        cout << "Time taken: " << tm.count() << " milliseconds\n";
+        //printf("Speed: %f Nodes/second\n\n ------------------------------------------------------------\n\n",nodes / tm.count() * 1000);
+    }
+}
+
+// returns the evaluation of the current position
+int alphaBeta(int depth, Board &board, int alpha, int beta) {
+  if (depth == 0) return board.evaluate();
+  int max = -INF;
+  MoveList ml(board);
+  Move *cursor = ml.begin();
+  while (cursor != ml.end()) {
+    board.play(*cursor);
+    int score = -alphaBeta(depth - 1, board, -beta, -alpha);
+    board.undo(*cursor);
+//    if (score >= beta) return beta;
+//    if (score > alpha) alpha = score;
+    if (score > max) max = score;
+    cursor++;
+  }
+  return max;
+  //return alpha;
+}
+
+
 void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uint64_t &castles, uint64_t &promotions, uint64_t &ep) {
   MoveList ml(board);
   Move *cursor = ml.begin();
@@ -18,7 +73,7 @@ void perftRec (int depth, Board &board, uint64_t &nodes, uint64_t &captures, uin
 
 //    for(int i=0; i<depth; i++) cout<<"    "; cout<<"-";  //prints moves
 //      cout << *cursor <<"\n";
-    if (__builtin_popcountll (board.getP(BLACK, King)) != 1)
+    if (pop_cntll(board.getP(BLACK, King)) != 1)
       board.drawBoard(), assert(false);
 
 
@@ -70,7 +125,7 @@ uint64_t perft(int depth, string fen, bool printAll) {
   chrono::duration<double, milli> tm = chrono::system_clock::now() - start;
   cout << "Time taken by program: " << tm.count() << " milliseconds\n";
   printf("Speed: %f Nodes/second\n\n ------------------------------------------------------------\n\n",
-           nodes / tm.count() * 1000000);
+           nodes / tm.count() * 1000);
 
   assert(board.checkInternRep());
   return nodes;

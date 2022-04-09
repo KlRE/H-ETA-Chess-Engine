@@ -5,6 +5,8 @@
 
 using namespace std;
 
+static const int INF = INT_MAX;
+
 class Move;
 
 enum Square : int{
@@ -63,6 +65,8 @@ uint64_t getCastleBbs(CastlingRights castle, Color color);
 
 void initCastleBbs();
 
+inline int pop_cnt(uint64_t bb) { return __builtin_popcount(bb);}
+inline int pop_cntll(uint64_t bb) { return __builtin_popcountll(bb); }
 inline Square lsb(uint64_t i) { return Square(__builtin_ffsll(i)-1); }
 Square pop_lsb(uint64_t &i);
 Square strToSq(string s);
@@ -91,5 +95,4 @@ string printMty(int i);
 int popcount(uint64_t i);
 
 void dividePerftOutput();
-
 #endif

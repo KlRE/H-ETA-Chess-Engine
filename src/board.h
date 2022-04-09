@@ -9,8 +9,9 @@
 
 using namespace std;
 
-void drawB(uint64_t bb, bool showNum = false);  //TODO: move to utility
+// for printing the board either for debugger or for running
 void drawSquareChar(bool black);
+void drawB(uint64_t bb, bool showNum = false);
 
 // todo: make history array like stockfish position.h line 197
 //Stores position information which cannot be recovered on undo-ing a move
@@ -120,6 +121,12 @@ public:
 
   // removes the piece on Square sq of any color (should be the right one)
   void removePiece(Square sq, Piece piece, Color color);
+
+
+  /* *****************************************
+     ************** in evaluate.cpp **********
+     ***************************************** */
+  int evaluate() const;
 };
 
 

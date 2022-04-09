@@ -9,7 +9,6 @@
 using namespace std;
 
 
-//TODO: migrate epSqBb to history (replace all instances of ep with h[0] or maybe not for better readability
 Board::Board(string s) {
   clearBoard();
   setFen(s);
@@ -92,7 +91,7 @@ uint64_t Board::sliderBlockers(Square sq, Color color)  // inspiration from stoc
   while (snipers) {
     Square s = pop_lsb(snipers);
     uint64_t blocks = getSquaresBetween(s, sq) & getP();
-    if (popcount(blocks) == 1 && blocks & getP(color)) {
+    if (pop_cntll(blocks) == 1 && blocks & getP(color)) {
       blockers |= blocks;
     }
   }
@@ -104,7 +103,7 @@ uint64_t Board::sliderBlockers(Square sq, Color color)  // inspiration from stoc
 *************  Miscellaneous  **********
 **************************************** */
 
-void Board::clearBoard() {  // todo maybe replace this in constructor
+void Board::clearBoard() {  // clears the board
   fill(occB, occB + 2, 0);
   fill(&pieces[0][0], &pieces[0][0] + sizeof(pieces) / sizeof(pieces[0][0]), 0);
   fill(board, board + 64, 0);

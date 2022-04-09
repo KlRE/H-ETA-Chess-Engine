@@ -236,7 +236,7 @@ void initBishop(bool test)
   for(int i=0;i<64;i++)	// basically, creates all possible blockerboards for each sqaure
     {
       uint64_t mask = magicBmask[i], temp;	   // create blockerboard mask (with all possible occurences)
-      int sqs = __builtin_popcountll(mask);		   // count blockerboard set bits
+      int sqs = pop_cntll(mask);		   // count blockerboard set bits
       vector<uint64_t> bits(sqs);			   // array with set bits of bb
 
       temp = mask;
@@ -250,7 +250,7 @@ void initBishop(bool test)
 	{
 	  uint64_t bbmask = mask;			   // create one blockermask subset
 	  int t = j;
-	  for(int k=0; k<__builtin_popcount(j);k++)
+	  for(int k=0; k < pop_cnt(j); k++)
 	    {
 	      int abit = 31 - __builtin_clz(t);
 	      t-= 1<<(31 - __builtin_clz(t));
@@ -336,7 +336,7 @@ void initRook(bool test)
   for(int i=0;i<64;i++)
     {
       uint64_t mask = magicRmask[i], temp;	   // create blockerboard mask (with all possible occurences)
-      int sqs = __builtin_popcountll(mask);		   // count blockerboard set bits
+      int sqs = pop_cntll(mask);		   // count blockerboard set bits
       vector<uint64_t> bits(sqs);			   // array with set bits of bb
 
       temp = mask;
@@ -350,7 +350,7 @@ void initRook(bool test)
 	{
 	  uint64_t bbmask = mask;			   // create one blockermask subset
 	  int t = j;
-	  for(int k=0; k<__builtin_popcount(j);k++)
+	  for(int k=0; k < pop_cnt(j); k++)
 	    {
 	      int abit = 31 - __builtin_clz(t);
 	      t-= 1<<(31 - __builtin_clz(t));
