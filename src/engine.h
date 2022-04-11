@@ -5,11 +5,7 @@
 
 using namespace std;
 
-class engine {
-
-};
-
-Move findBest(int depth, Board &board);
+Move findBest(int depth, Board &board, int &score);
 void iterativeDeepening(string fen, int depth);
 void iterativeDeepening(Board &board, int maxDepth);
 int alphaBeta(int depth, Board &board, int alpha, int beta);

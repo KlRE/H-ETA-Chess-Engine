@@ -425,8 +425,8 @@ void Board::drawBoard() {
   else
     cout << "No En Passent Square \n";
 
-  cout << SideToMove << " to Move: \n";
-
+  cout << SideToMove << " to Move \n";
+  cout << "Fen: " << toFen() << "\n";
 }
 
 void drawB(uint64_t bb, bool showNum) {
@@ -450,11 +450,11 @@ void drawB(uint64_t bb, bool showNum) {
 
 void drawSquareChar(bool black) {
  if (black)
-   cout << "█";
-   //cout << static_cast<char> (219);
+   //cout << "█";
+   cout << static_cast<char> (219);
  else
-   cout << "▒";
-   //cout << static_cast<char> (177);
+   //cout << "▒";
+   cout << static_cast<char> (177);
 }
 
 

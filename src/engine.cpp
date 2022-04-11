@@ -1,4 +1,3 @@
-#define NDEBUG
 #include <assert.h>
 #include <string>
 #include <chrono>
@@ -10,21 +9,23 @@
 
 using namespace std;
 
-Move findBest(int depth, Board &board, int &bestScore) {
+Move findBest(int depth, Board &board, int &alpha) {
     Move bestMove;
+    alpha = -INF;
+    int beta = INF;
     MoveList ml(board);
     Move *cursor = ml.begin();
-    Color color = board.getSideToMove();
     while (cursor != ml.end()) {
         board.play(*cursor);
-        int score = alphaBeta(depth - 1, board, -INF, INF);
+        int score = -alphaBeta(depth - 1, board, -beta, -alpha);
         board.undo(*cursor);
-        if (score > bestScore) {
-            bestScore = score;
+        if (score > alpha) {  // beta is always INF so alpha can't be higher than beta
+            alpha = score;
             bestMove = *cursor;
         }
         cursor++;
     }
+
     return bestMove;
 }
 void iterativeDeepening(string fen, int depth) {
@@ -33,14 +34,18 @@ void iterativeDeepening(string fen, int depth) {
 }
 
 void iterativeDeepening(Board &board, int maxDepth) {
+
     for (int depth = 1; depth <= maxDepth; depth++) {
-        auto start = chrono::system_clock::now();
+        //auto start = chrono::system_clock::now();
         int score = -INF;
         Move move = findBest(depth, board, score);
 
-        cout << "Depth: " << depth << " Score: " << score << " Move: " << move << endl;
-        chrono::duration<double, milli> tm = chrono::system_clock::now() - start;
-        cout << "Time taken: " << tm.count() << " milliseconds\n";
+        cout << "info depth " << depth << " score cp " << score << " currmove " << move.from() << move.to() << endl;
+        if (depth == maxDepth) {
+            cout << "bestmove " << move.from() << move.to() << endl;
+        }
+        //chrono::duration<double, milli> tm = chrono::system_clock::now() - start;
+        //cout << "Time taken: " << tm.count() << " milliseconds\n\n";
         //printf("Speed: %f Nodes/second\n\n ------------------------------------------------------------\n\n",nodes / tm.count() * 1000);
     }
 }
@@ -48,20 +53,17 @@ void iterativeDeepening(Board &board, int maxDepth) {
 // returns the evaluation of the current position
 int alphaBeta(int depth, Board &board, int alpha, int beta) {
   if (depth == 0) return board.evaluate();
-  int max = -INF;
   MoveList ml(board);
   Move *cursor = ml.begin();
   while (cursor != ml.end()) {
     board.play(*cursor);
     int score = -alphaBeta(depth - 1, board, -beta, -alpha);
     board.undo(*cursor);
-//    if (score >= beta) return beta;
-//    if (score > alpha) alpha = score;
-    if (score > max) max = score;
+    if (score >= beta) return beta;
+    if (score > alpha) alpha = score;
     cursor++;
   }
-  return max;
-  //return alpha;
+  return alpha;
 }
 
 

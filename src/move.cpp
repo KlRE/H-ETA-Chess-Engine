@@ -261,7 +261,7 @@ Move *Board::generateMoves(Move *list) {
   attacked |= KingAttack(OpKing);
   attacked |= getP(SideToMove);  //Pieces of opponent are either capturable or attacked by other opp pieces
 
-  list = generateKingM(list, attacked, getP(!SideToMove), OuKing);
+  //list = generateKingM(list, attacked, getP(!SideToMove), OuKing);
 
   uint64_t checkers = attacksTo(OuKing,
                                 !SideToMove); //maybe no need to check for queen and rook bc it can be done later with pinning step (s. surge-master)
@@ -272,8 +272,10 @@ Move *Board::generateMoves(Move *list) {
 
   int num_checkers = pop_cntll(checkers);
 
-  if (num_checkers > 1)
+  if (num_checkers > 1) {
+    list = generateKingM(list, attacked, getP(!SideToMove), OuKing);
     return list;
+  }
 
   else if (num_checkers == 1) {
     pushMask = getSquaresBetween(lsb(checkers), OuKing);
@@ -294,7 +296,7 @@ Move *Board::generateMoves(Move *list) {
   list = generateKnightM(list, pinned, pushMask, captureMask, getP(SideToMove, Knight));
   list = generateBishopM(list, pinned, pushMask, captureMask, getP(SideToMove, Bishop), OuKing);
   list = generateQueenM(list, pinned, pushMask, captureMask, getP(SideToMove, Queen), OuKing);
-
+  list = generateKingM(list, attacked, getP(!SideToMove), OuKing);
   //drawB(getP(SideToMove, Pawn));
 
   return list;

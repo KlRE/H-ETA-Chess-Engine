@@ -31,7 +31,7 @@ public:
     assignValues(from, to, flags);
   }
 
-  //for debugging
+  //for uci
   Move(string move, const Board &board) {
     Square from = strToSq(move.substr(0,2));
     Square to = strToSq(move.substr(2,2));
@@ -39,17 +39,22 @@ public:
     // check if the Pawn is being promoted
     uint64_t promLine = board.getSideToMove() == WHITE ? getLines(a7, h7) : getLines(a2, h2);
 
-    if (board.getPieceOn(from) == Pawn && toBb(to) & promLine)
+    if (board.getPieceOn(from) == Pawn && toBb(from) & promLine)
       promoted = true;
+//    drawB(toBb(to));
+//    drawB(promLine);
 
     if (board.getPieceOn(from) == King) {
       if ((from == e1 && to == g1) ||(from == e8 && to == g8))
         assignValues(from, to, OO);
       else if ((from == e1 && to == c1) || (from == e8 && to == c8))
         assignValues(from, to, OOO);
-      else
+      else if (board.getPieceOn(to) == NoPiece)
         assignValues(from, to);
+      else
+        assignValues(from, to, CAPTURE);
     }
+
     else if (board.getPieceOn(to) == NoPiece) {
       if (board.getPieceOn(from) == Pawn) {
         if (promoted) {

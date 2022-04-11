@@ -2,6 +2,7 @@
 #define UTILITY_H
 
 #include <vector>
+#include <climits>
 
 using namespace std;
 
@@ -91,8 +92,6 @@ Color operator!(Color color);
 
 ostream &operator<<(ostream &os, MoveFlags mv);
 string printMty(int i);
-
-int popcount(uint64_t i);
 
 void dividePerftOutput();
 #endif

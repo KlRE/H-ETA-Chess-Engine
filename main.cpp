@@ -7,6 +7,8 @@
 #include "attacks.h"
 #include "move.h"
 #include "engine.h"
+#include "uci.h"
+
 
 
 using namespace std;
@@ -32,9 +34,11 @@ using namespace std;
 int main(int argc, char *argv[]) {
   //alltests();
   initAttacks();
-  //perft(5, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
-  Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-  iterativeDeepening(board, 10);
+  perft(5, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false);
+//  Board board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+//  iterativeDeepening(board, 10);
+//  cout << "H:ETA  v1.0 by erikw " << endl;
+//  loop(argc, argv);
 }
 
 
